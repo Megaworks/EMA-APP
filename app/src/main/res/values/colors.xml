@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red">#D83636</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="blue">#3B52D5</color>
+    <color name="bg_start">#00d97b</color>
+    <color name="bg_end">#5000ff</color>
+
+    <color name="black">#292929</color>
+
+    <color name="black1">#4a4a4a</color>
+    <color name="black1_1">#696969</color>
+
+    <color name="black2">#5c5c5c</color> //메인 프로이트 말풍선 안에 Text
+    <color name="black3">#373737</color>  //메인 오전오후검사 매일~ Text
+
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="gray">#555555</color>
+    <color name="light_gray1">#d9d9d9</color>
+    <color name="light_gray2">#F3F3F3</color>
+
+    <color name="light_gray3">#ededed</color> //회원가입 editText
+
+    <color name="pink">#f1a2b2</color>
+    <color name="pink2">#FDEDF0</color>
+    <color name="pink3">#EA718A</color>
+    <color name="pink4">#F9DAE0</color>
+    <color name="yellow">#FEFF98</color>
+    <color name="orange">#ff7e02</color>
+
+    <color name="title_color_purple_bg">#b695f8</color> //로그인 배경 하단
+    <color name="title_color_purple_bg2">#bcb3ff</color> //메인 버튼 안에
+
+    <color name="title_color_purple1">#a097f9</color> //회원가입 비활성화 버튼 bg
+    <color name="title_color_purple1_1">#7139f2</color> //회원가입 활성화 버튼 bg
+    <color name="title_color_purple2">#e6e1ff</color> //메인 설문지랑 주간리포트 box color
+    <color name="title_color_purple3">#59539a</color> //회원가입 비활성화 버튼 Text
+    <color name="title_color_purple4">#e2e0fd</color> //회원가입 비활성화 버튼 bg
+
+
+    <color name="title_color_purple_text1">#4f5182</color> //로그인
+    <color name="title_color_purple_text2">#746ed8</color> //메인 오전검사 오후검사 Text
+    <color name="title_color_purple_text3">#524cbf</color> //메인 설문지 Text
+
+    <color name="title_color_blue_bg">#629bfa</color>  //로그인 배경 상단
+    <color name="title_color_blue_bg2">#98b3fe</color> //메인 버튼 안에
+    <color name="title_color_blue_bg3">#dddbfd</color> //로그인 버튼 bg
+
+    <color name="title_color_white_text1">#d5e1fe</color> //메인 심리케어를 위해~
+
+
+
+    <color name="report1">#f4c238</color>
+    <color name="report2">#a097f9</color>
+    <color name="report3">#f1a2b2</color>
+    <color name="report4">#95ceec</color>
+
+    <color name="temp1">#8ad491</color>
+    <color name="temp2">#95ceec</color>
+    <color name="temp3">#f1a2b2</color>
+
+    <color name="voice1">#f4c238</color>
+    <color name="voice2">#a097f9</color>
+
+    <color name="phq1">#8ad491</color>
+    <color name="phq2">#95ceec</color>
+    <color name="phq3">#a097f9</color>
+    <color name="phq4">#f1a2b2</color>
+
+    <color name="frued1">#8ad491</color>
+    <color name="frued2">#f4c238</color>
+    <color name="frued3">#a097f9</color>
+    <color name="frued4">#f1a2b2</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="transparent2">#CC000000</color>
+
+
+
+
+</resources>

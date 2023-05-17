@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_layout_title_gradient"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_layout_title_gradient"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/back"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="left|center"
+                        android:paddingLeft="20dp"
+                        android:src="@drawable/ic_arrow_back" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="검사 안내"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="-24dp"
+        android:background="@drawable/design_bg_white"
+        android:orientation="vertical"
+        android:paddingTop="32dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/layout_bg_white2"
+            android:orientation="vertical"
+            android:paddingTop="14dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center"
+                android:text="CHECK LIST"
+                android:textColor="@color/title_color_purple1_1"
+                android:textSize="22dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/checklist_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:gravity="center"
+                android:text="2022-09-05 (실시간 날짜)"
+                android:textColor="@color/black3"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- 1 -->
+                <LinearLayout
+                    android:id="@+id/check_box_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:layout_marginHorizontal="26dp"
+                    android:layout_marginTop="34dp"
+                    android:background="@drawable/bg_layout_white_radius"
+                    android:elevation="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/check1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="30dp"
+                        android:layout_weight="1"
+                        android:gravity="left|center_vertical"
+                        android:text="1. 기분 온도계"
+                        android:textColor="@color/black3"
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
+
+                    <!-- 완료 아이콘 -->
+                    <FrameLayout
+                        android:id="@+id/check_icon_1"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/bg_layout_circle_white"
+                        android:backgroundTint="@color/light_gray3">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:layout_marginBottom="3dp"
+                                android:src="@drawable/check1" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:gravity="center_horizontal"
+                                android:text="완료"
+                                android:textColor="@color/black3"
+                                android:textSize="11dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 1 box 밑에 설명 -->
+                <TextView
+                    android:id="@+id/check1_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="65dp"
+                    android:layout_marginTop="15dp"
+                    android:lineHeight="22dp"
+                    android:text="다음은 기분 온도계 검사입니다.\n현재 기분을 설정해 주세요."
+                    android:textColor="@color/gray"
+                    android:textSize="14dp"
+                    android:visibility="gone" />
+
+                <!-- 3 -->
+                <LinearLayout
+                    android:id="@+id/check_box_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:layout_marginHorizontal="26dp"
+                    android:layout_marginTop="34dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_layout_white_radius"
+                    android:elevation="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/check3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="30dp"
+                        android:layout_weight="1"
+                        android:gravity="left|center_vertical"
+                        android:text="3. 음성 테스트 2"
+                        android:textColor="@color/black3"
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
+
+                    <!-- 완료 아이콘 -->
+                    <FrameLayout
+                        android:id="@+id/check_icon_3"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/bg_layout_circle_white"
+                        android:backgroundTint="@color/light_gray3">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:layout_marginBottom="3dp"
+                                android:src="@drawable/check1" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:gravity="center_horizontal"
+                                android:text="완료"
+                                android:textColor="@color/black3"
+                                android:textSize="11dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 3 box 밑에 설명 -->
+                <TextView
+                    android:id="@+id/check3_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="65dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:lineHeight="22dp"
+                    android:text="다음은  두번째 음성 진단 검사 입니다.\n화면에 보이는 안내에 따라\n녹음을 진행해 주세요. "
+                    android:textColor="@color/gray"
+                    android:textSize="14dp"
+                    android:visibility="gone" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="20dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/check_end1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="6dp"
+                        android:gravity="center"
+                        android:text="기분 온도"
+                        android:textColor="@color/black3"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/check_end1_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="1점"
+                        android:textColor="@color/orange"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/check_end1_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="6dp"
+                        android:gravity="center"
+                        android:text="음성 테스트 결과"
+                        android:textColor="@color/black3"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/check_end1_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="보통 or 주의"
+                        android:textColor="@color/orange"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/check_end2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="17dp"
+                    android:gravity="center"
+                    android:text="검사가 끝났습니다. 수고하셨습니다!"
+                    android:textColor="@color/gray"
+                    android:textSize="14dp"
+                    android:visibility="visible" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:background="@color/title_color_purple1_1" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnNext"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_layout_circle_purple_gradient"
+                    android:backgroundTint="@color/title_color_purple1_1"
+                    android:text="다음"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
