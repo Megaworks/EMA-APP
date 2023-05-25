@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -154,7 +155,8 @@ public class GuideActivity extends AppCompatActivity {
                     requestMap.put("answer", RequestBody.create(MediaType.parse("text/plain"), result.getAnswer()));
                 else if (filePath != null) {
                     String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-                    RequestBody fileBody = RequestBody.create(MultipartBody.FORM, filePath);
+                    File file = new File(filePath);
+                    RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
                     MultipartBody.Part filePart = MultipartBody.Part.createFormData("files", fileName, fileBody);
                     files.add(filePart);
