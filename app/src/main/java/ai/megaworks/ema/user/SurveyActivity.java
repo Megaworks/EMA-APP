@@ -24,6 +24,7 @@ import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.layout.CustomSurveyFragment;
 import ai.megaworks.ema.layout.ShortAnswerRangeItemFragment;
+import ai.megaworks.ema.layout.ShortAnswerYNItemFragment;
 import ai.megaworks.ema.layout.TemperatureItemFragment;
 import ai.megaworks.ema.layout.VoiceRecordItemFragment;
 import retrofit2.Call;
@@ -98,6 +99,10 @@ public class SurveyActivity extends AppCompatActivity {
                             fragment = new TemperatureItemFragment(getApplicationContext(), rootSurvey);
                         } else if (type.equals("RECORD")) {
                             fragment = new VoiceRecordItemFragment(getApplicationContext(), rootSurvey, getExternalCacheDir().getAbsolutePath());
+                        } else if (type.equals("RANGE")) {
+                            fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), rootSurvey);
+                        } else if (type.equals("YN")) {
+                            fragment = new ShortAnswerYNItemFragment(getApplicationContext(), rootSurvey);
                         }
                         fragmentTransaction.add(R.id.list, fragment);
                         fragments.add(fragment);
@@ -112,6 +117,8 @@ public class SurveyActivity extends AppCompatActivity {
                             fragment = new VoiceRecordItemFragment(getApplicationContext(), survey, getExternalCacheDir().getAbsolutePath());
                         } else if (type.equals("RANGE")) {
                             fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), survey);
+                        } else if (type.equals("YN")) {
+                            fragment = new ShortAnswerYNItemFragment(getApplicationContext(), survey);
                         }
                         fragmentTransaction.add(R.id.list, fragment);
                         fragments.add(fragment);

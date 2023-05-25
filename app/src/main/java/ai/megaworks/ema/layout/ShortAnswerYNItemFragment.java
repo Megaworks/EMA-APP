@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
+import ai.megaworks.ema.databinding.FragmentShortAnswerYnItemBinding;
 import ai.megaworks.ema.databinding.FragmentTemperatureItemBinding;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -21,15 +23,7 @@ public class ShortAnswerYNItemFragment extends CustomSurveyFragment {
 
     private final Survey survey;
 
-    private int tempValue = 1;
-
     private Class clazz;
-
-
-    private final RetrofitClient retrofitClient = RetrofitClient.getInstance();
-
-    private final IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
-
 
     public ShortAnswerYNItemFragment(Context context, Survey survey) {
         this.context = context;
@@ -37,7 +31,6 @@ public class ShortAnswerYNItemFragment extends CustomSurveyFragment {
         this.surveyResult.setSubSurveyId(survey.getId());
         this.surveyResult.setSurveySubjectId(Global.TOKEN.getSurveySubjectId());
         this.surveyResult.setSurveyAt(Global.defaultDateStr);
-        this.surveyResult.setAnswer("1");
     }
 
     public ShortAnswerYNItemFragment(Context context, Survey survey, Class clazz) {
@@ -53,37 +46,13 @@ public class ShortAnswerYNItemFragment extends CustomSurveyFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentTemperatureItemBinding binding = FragmentTemperatureItemBinding.inflate(inflater, container, false);
+        FragmentShortAnswerYnItemBinding binding = FragmentShortAnswerYnItemBinding.inflate(inflater, container, false);
 
-        binding.slider.addOnChangeListener((slider, value, fromUser) -> {
-            int roundValue = Math.round(value);
-            binding.tempValue.setText(roundValue + "점");
-            this.surveyResult.setAnswer(String.valueOf(roundValue));
+        binding.survey.setText(survey.getQuestion());
 
-            System.out.println(surveyResult);
-
-            if (value < 2) {
-                binding.temperature.setImageResource(R.drawable.ic_temp1);
-            } else if (value < 3) {
-                binding.temperature.setImageResource(R.drawable.ic_temp2);
-            } else if (value < 4) {
-                binding.temperature.setImageResource(R.drawable.ic_temp3);
-            } else if (value < 5) {
-                binding.temperature.setImageResource(R.drawable.ic_temp4);
-            } else if (value < 6) {
-                binding.temperature.setImageResource(R.drawable.ic_temp5);
-            } else if (value < 7) {
-                binding.temperature.setImageResource(R.drawable.ic_temp6);
-            } else if (value < 8) {
-                binding.temperature.setImageResource(R.drawable.ic_temp7);
-            } else if (value < 9) {
-                binding.temperature.setImageResource(R.drawable.ic_temp8);
-            } else if (value < 10) {
-                binding.temperature.setImageResource(R.drawable.ic_temp9);
-            } else {
-                binding.temperature.setImageResource(R.drawable.ic_temp10);
-            }
-
+        binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton radioButton = group.findViewById(checkedId);
+            this.surveyResult.setAnswer(radioButton.getText().toString());
         });
 
         if (this.clazz != null) {
