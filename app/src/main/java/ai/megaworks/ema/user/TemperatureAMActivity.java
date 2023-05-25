@@ -14,6 +14,8 @@ import com.google.android.material.slider.Slider;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
+import ai.megaworks.ema.domain.survey.SurveyResult;
+import ai.megaworks.ema.domain.survey.SurveyResultRequest;
 
 public class TemperatureAMActivity extends AppCompatActivity {
 
@@ -22,10 +24,10 @@ public class TemperatureAMActivity extends AppCompatActivity {
     private AppCompatButton btnNext;
     private TextView tempValue;
     private Slider slider;
-    String TempScore = "1";
+    String tempScore = "1";
 
     // 안드로이드 뒤로가기 버튼 기능
-    private  BackKeyHandler backKeyHandler = new BackKeyHandler(this);
+    private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class TemperatureAMActivity extends AppCompatActivity {
 //        exampleDialog.show();
 //        exampleDialog.setCancelable(false);
 
+
+
         btnBack = findViewById(R.id.back);
         btnNext = findViewById(R.id.btnNext);
         temperature = findViewById(R.id.temperature);
@@ -47,59 +51,66 @@ public class TemperatureAMActivity extends AppCompatActivity {
 
         btnNext.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
-            intent.putExtra("testType","AM2");
-            intent.putExtra("tempValue",TempScore);
+            SurveyResult surveyResultRequest = SurveyResult.builder()
+                    .subSurveyId(5L)
+                    .surveyAt(Global.dateToString(Global.DATE_FORMATTER2))
+                    .answer(tempScore)
+                    .surveySubjectId(Global.TOKEN.getSurveySubjectId())
+                    .build();
+
+            intent.putExtra("surveyResult", surveyResultRequest);
             startActivity(intent);
         });
 
         slider.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                if(value < 2){
+                if (value < 2) {
                     temperature.setImageResource(R.drawable.ic_temp1);
                     tempValue.setText("1점");
-                    TempScore = "1";
-                }else if (value < 3){
+                    tempScore = "1";
+                } else if (value < 3) {
                     temperature.setImageResource(R.drawable.ic_temp2);
                     tempValue.setText("2점");
-                    TempScore = "2";
-                }else if (value < 4){
+                    tempScore = "2";
+                } else if (value < 4) {
                     temperature.setImageResource(R.drawable.ic_temp3);
                     tempValue.setText("3점");
-                    TempScore = "3";
-                }else if (value < 5){
+                    tempScore = "3";
+                } else if (value < 5) {
                     temperature.setImageResource(R.drawable.ic_temp4);
                     tempValue.setText("4점");
-                    TempScore = "4";
-                }else if (value < 6){
+                    tempScore = "4";
+                } else if (value < 6) {
                     temperature.setImageResource(R.drawable.ic_temp5);
                     tempValue.setText("5점");
-                    TempScore = "5";
-                }else if (value < 7){
+                    tempScore = "5";
+                } else if (value < 7) {
                     temperature.setImageResource(R.drawable.ic_temp6);
                     tempValue.setText("6점");
-                    TempScore = "6";
-                }else if (value < 8){
+                    tempScore = "6";
+                } else if (value < 8) {
                     temperature.setImageResource(R.drawable.ic_temp7);
                     tempValue.setText("7점");
-                    TempScore = "7";
-                }else if (value < 9){
+                    tempScore = "7";
+                } else if (value < 9) {
                     temperature.setImageResource(R.drawable.ic_temp8);
                     tempValue.setText("8점");
-                    TempScore = "8";
-                }else if (value < 10){
+                    tempScore = "8";
+                } else if (value < 10) {
                     temperature.setImageResource(R.drawable.ic_temp9);
                     tempValue.setText("9점");
-                    TempScore = "9";
-                }else {
+                    tempScore = "9";
+                } else {
                     temperature.setImageResource(R.drawable.ic_temp10);
                     tempValue.setText("10점");
-                    TempScore = "10";
+                    tempScore = "10";
                 }
             }
         });
         btnBack.setOnClickListener(view -> finish());
     }
+
     @Override
     public void onBackPressed() {
         backKeyHandler.onBackPressed();
@@ -108,6 +119,5 @@ public class TemperatureAMActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Global.checkedNetwork(this);
     }
 }

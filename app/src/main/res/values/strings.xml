@@ -1,7 +1,14 @@
 <resources>
     <string name="app_name">EMA</string>
-    <string name="default_notification_channel_id">mentalhealth-cadb2</string>
-    <string name="fcm_token">dCy--7DqQVqqtNbWPz_Por:APA91bFKolgfkWcvL1Sf_k6I-SrtkmVpxH8OtRfwzr_mDKk8tuf5ipR3eu6s0OWDsP846gN5Y12AqpMemA4-5SBvrt6OwNzA5D0i2VkLb9eQ-w_lgFuD3xEYgCFmZ0bPwz06A0olpYAe</string>
+    <string name="error_login">아이디 또는 비밀번호를 확인해주세요.</string>
+    <string name="error_network_with_server">"서버와 연결이 불안정합니다. 다시 시도해주세요."</string>
+    <string name="permission_denied_network">네트워크 연결이 되지 않았습니다.</string>
+    <string name="permission_warn_message">앱 실행을 위해서는 권한을 설정해야 합니다</string>
+
+    <string name="already_done_survey">이미 설문조사를 시행하였습니다.</string>
+    <string name="no_available_time">설문 조사 가능 시간이 아닙니다.</string>
+
+    <string name="default_notification_channel_id">ema-cadb2</string>
 
     <string name="title_a">녹음 시작 단추를 누른 뒤\n아래 모든 문장을 읽고, 녹음 종료를 누르십시오.</string>
     <string name="content_b">우리나라의 가을은 참으로 아름답다.\n\n무엇보다도 산에 오를 땐 더욱더 그 빼어난 아름다움이 느껴진다.

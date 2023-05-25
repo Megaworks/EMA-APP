@@ -31,19 +31,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.dialog.ProgressDialog;
+import ai.megaworks.ema.domain.survey.SurveyResult;
+import ai.megaworks.ema.domain.survey.SurveyResultRequest;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okio.BufferedSink;
 
 
 public class RecordAMActivity extends AppCompatActivity {
@@ -57,7 +58,7 @@ public class RecordAMActivity extends AppCompatActivity {
     private Thread recordingThread = null;
     private boolean isRecording = false;
     private String filePath = null;
-    private String WavFileName = "test1.pcm";
+    private String fileName = Global.dateToString(Global.DATETIME_FORMATTER3);
     private TextView recordingTimeText, recordComment, recordComment2, title;//, progress2, progress3;
     private int RecordSeq = 0;
     LinearLayout record3bg;
@@ -92,9 +93,9 @@ public class RecordAMActivity extends AppCompatActivity {
 //        setButtonHandlers();
 //        enableButtons(false);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
         int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
         Log.v("bfsize", String.valueOf(bufferSize));
 
@@ -122,11 +123,10 @@ public class RecordAMActivity extends AppCompatActivity {
 
 
         record1.setEnabled(false);
-        record3.setEnabled(true);
+        record3.setEnabled(false);
 
         title.setText("음성 테스트 1");
-        tempValue = intent.getStringExtra("tempValue");
-        recordComment.setText("오늘 기분은 " + tempValue + "점 이네요.\n오늘 기분과 컨디션에 대해\n짧게 이야기 해주세요.");
+        recordComment.setText("오늘 기분과 컨디션에 대해\n짧게 이야기 해주세요.");
 
         record2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,8 +142,8 @@ public class RecordAMActivity extends AppCompatActivity {
             public void onClick(View view) {
                 customProgressDialog.show();
                 customProgressDialog.setCancelable(false);
-                File rawPath = new File(getExternalCacheDir().getAbsolutePath() + "/test1.pcm");
-                File newPath = new File(getExternalCacheDir().getAbsolutePath() + "/test1.wav");
+                File rawPath = new File(getExternalCacheDir().getAbsolutePath()  + "/" + fileName + ".pcm");
+                File newPath = new File(getExternalCacheDir().getAbsolutePath()  + "/" + fileName + ".wav");
 //                File rawPath2 = new File(getExternalCacheDir().getAbsolutePath()+"/test2.pcm");
 //                File newPath2 = new File(getExternalCacheDir().getAbsolutePath()+"/test2.wav");
                 try {
@@ -152,7 +152,7 @@ public class RecordAMActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String filePath1 = "test1.wav";
+                String filePath1 = fileName + ".wav";
 //                String filePath2 = "test2.wav";
 //                CombineWaveFile(filePath1,filePath2);
 
@@ -178,7 +178,6 @@ public class RecordAMActivity extends AppCompatActivity {
                     isRecording = false;
                     recordComment.setText("오늘 기분은 " + tempValue + "점 이네요.\n오늘 기분과 컨디션에 대해\n짧게 이야기 해주세요.");
                     recordComment2.setText("녹음 버튼을 누르고 말씀하시고,\n일시정지 버튼을 누른 뒤\n오른쪽 업로드 버튼을 눌러주세요.");
-                    WavFileName = "test1.pcm";
                     record2.setEnabled(true);
                     dialog.dismiss();
                 });
@@ -195,7 +194,7 @@ public class RecordAMActivity extends AppCompatActivity {
 
     private void setRecodingButton(boolean recoding) {
         if (recoding) {
-            startRecording(WavFileName);
+            startRecording(fileName);
             record2.setBackgroundResource(R.drawable.ic_baseline_pause_24); //이거말고 xml에 아이디 record2_1인거 gone 시켜논거 있으니 그거 띄워주세용
             timeHandler.sendEmptyMessage(0);
 
@@ -256,7 +255,7 @@ public class RecordAMActivity extends AppCompatActivity {
 
     private void writeAudioDataToFile(String fileName) {
         // Write the output audio in byte
-        filePath = getExternalCacheDir().getAbsolutePath() + "/" + fileName;
+        filePath = getExternalCacheDir().getAbsolutePath() + "/" + fileName + ".pcm";
         short sData[] = new short[BufferElements2Rec];
         FileOutputStream os = null;
         try {
@@ -309,12 +308,11 @@ public class RecordAMActivity extends AppCompatActivity {
             Log.v("countTime", String.format("%02d:%02d", min, sec));
 
             timeHandler.sendEmptyMessageDelayed(0, 1000);
-
             if (recordingTime == 31) {
                 isRecording = !isRecording;
                 setRecodingButton(isRecording);
-                File rawPath = new File(getExternalCacheDir().getAbsolutePath() + "/test1.pcm");
-                File newPath = new File(getExternalCacheDir().getAbsolutePath() + "/test1.wav");
+                File rawPath = new File(getExternalCacheDir().getAbsolutePath()  + "/" + fileName + ".pcm");
+                File newPath = new File(getExternalCacheDir().getAbsolutePath()  + "/" + fileName + ".wav");
                 try {
                     rawToWave(rawPath, newPath); // PCM to WAV
                 } catch (IOException e) {
@@ -341,20 +339,21 @@ public class RecordAMActivity extends AppCompatActivity {
 
 //        String ipv4Address = "133.186.251.245";
 //        String portNumber = "5001";
-        String endpoint = "survey/result";
-        String postUrl = Global.AI_SERVER_URL+endpoint;
+        String endpoint = "surveyupload";
+        String postUrl = Global.API_SERVER_URL + endpoint;
 //        String postUrl= "http://"+ipv4Address+":"+portNumber+"/"+endpoint;
 
-        File mergePath = new File(getExternalCacheDir().getAbsolutePath()+"/test1.wav");
+        List<String> filePaths = new ArrayList<>();
+        filePaths.add(getExternalCacheDir().getAbsolutePath()  + "/" + fileName + ".wav");
 
-        RequestBody postBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("subjectId", Global.TOKEN.getId().toString())
-                .addFormDataPart("surveyId", "10")
-                .addFormDataPart("surveyAt", Global.strDate)
-                .addFormDataPart("files",Global.TOKEN.getId()+"_"+Global.strDate+"_"+"AM1.wav",RequestBody.create(MultipartBody.FORM, mergePath))
-                .build();
-        postRequest(postUrl, postBody);
+        SurveyResult request = SurveyResult.builder()
+//                .filePaths(filePaths)
+                .surveySubjectId(Global.TOKEN.getSurveySubjectId())
+                .subSurveyId(10L)
+                .surveyAt(Global.dateToString(Global.DATE_FORMATTER2)).build();
+        Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
+        intent.putExtra("surveyResult", request);
+        startActivity(intent);
     }
 
     void postRequest(String postUrl, RequestBody postBody) {
@@ -398,7 +397,7 @@ public class RecordAMActivity extends AppCompatActivity {
                                     Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
                                     intent.putExtra("time", startTime);
                                     intent.putExtra("tempValue", tempValue);
-                                    intent.putExtra("testType", "AM4");
+                                    intent.putExtra("testType", "AM3");
                                     startActivity(intent);
 
                                 } catch (IOException e) { //
@@ -411,7 +410,7 @@ public class RecordAMActivity extends AppCompatActivity {
 
                         } else {
                             Log.d(TAG + "fail", response.code() + "");
-                            Toast.makeText(RecordAMActivity.this, "인터넷 연결을 확인해주세요.222222", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RecordAMActivity.this, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show();
                         }
                         customProgressDialog.dismiss();
                     }
@@ -514,7 +513,7 @@ public class RecordAMActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        backKeyHandler.onBackPressed();
+        // backKeyHandler.onBackPressed();
     }
 
     private void CombineWaveFile(String file1, String file2) {
@@ -620,7 +619,6 @@ public class RecordAMActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Global.checkedNetwork(this);
     }
 
 }

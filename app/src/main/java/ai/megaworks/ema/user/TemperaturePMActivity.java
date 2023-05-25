@@ -135,7 +135,6 @@ public class TemperaturePMActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Global.checkedNetwork(this);
     }
 
 }

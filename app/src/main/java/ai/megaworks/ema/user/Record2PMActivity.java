@@ -357,12 +357,12 @@ public class Record2PMActivity extends AppCompatActivity {
 //        String ipv4Address = "133.186.251.245";
 //        String portNumber = "5001";
         String endpoint = "predict";
-        String postUrl = Global.AI_SERVER_URL+endpoint;
+        String postUrl = Global.API_SERVER_URL +endpoint;
 //        String postUrl= "http://"+ipv4Address+":"+portNumber+"/"+endpoint;
         File mergePath = new File(getExternalCacheDir().getAbsolutePath()+"/test1.wav");
         RequestBody postBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", Global.TOKEN.getId()+"_"+Global.strDate+"_"+"PM_bad.wav",RequestBody.create(MultipartBody.FORM, mergePath))
+                .addFormDataPart("file", Global.TOKEN.getSubjectId()+"_"+Global.defaultDateStr +"_"+"PM_bad.wav",RequestBody.create(MultipartBody.FORM, mergePath))
                 .build();
         postRequest(postUrl, postBody);
     }
@@ -630,7 +630,6 @@ public class Record2PMActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Global.checkedNetwork(this);
     }
 
 }

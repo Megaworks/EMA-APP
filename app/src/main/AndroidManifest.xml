@@ -20,12 +20,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MentalHealth">
-
+        <activity
+            android:name="ai.megaworks.ema.user.SurveyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="ai.megaworks.ema.user.TemperatureActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.TemperatureAMActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.TemperaturePMActivity"
             android:exported="true"
@@ -35,7 +41,11 @@
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="ai.megaworks.ema.user.UpdatePasswordActivity"
+            android:name="ai.megaworks.ema.user.PreSurveyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="ai.megaworks.ema.user.RecordActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
@@ -69,53 +79,17 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ai.megaworks.ema.user.PHQ9Activity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.PHQ9resultActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name="ai.megaworks.ema.user.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.TempPasswordActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.AgreementActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.ReportActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.GuideActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.ThisWeekReportActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.FreudFeedbackActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-
-<!--        <service android:name=".firebase.FirebaseMessagingService"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
-<!--            </intent-filter>-->
-<!--        </service>-->
         <service
             android:name="ai.megaworks.ema.firebase.FirebaseMessagingService"
             android:exported="false">

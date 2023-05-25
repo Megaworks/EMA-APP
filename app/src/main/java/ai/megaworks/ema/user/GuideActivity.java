@@ -1,32 +1,34 @@
 package ai.megaworks.ema.user;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
-import ai.megaworks.ema.api.MindcareApi;
-import ai.megaworks.ema.api.RetrofitClient;
-import ai.megaworks.ema.api.SurveyResultRequest;
-import ai.megaworks.ema.api.UserData;
+import ai.megaworks.ema.domain.IEmaService;
+import ai.megaworks.ema.domain.RetrofitClient;
+import ai.megaworks.ema.domain.survey.Survey;
+import ai.megaworks.ema.domain.survey.SurveyResult;
+import ai.megaworks.ema.layout.GuideItemFragment;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,265 +36,178 @@ import retrofit2.Response;
 
 public class GuideActivity extends AppCompatActivity {
 
-    private LinearLayout back;
+    private final String TAG = this.getClass().getName();
 
-    private TextView title;
-    private LinearLayout check_box_1, check_box_3;
-    private TextView check1, check3, check1_comment, check3_comment, check_end1, check_end1_2, check_end1_3, check_end1_4, check_end2, checklist_date;
-    private FrameLayout check_icon_1, check_icon_3;
-    private AppCompatButton btnNext;
-    private MediaPlayer mediaPlayer;
+    private RetrofitClient retrofitClient = RetrofitClient.getInstance();
 
-
-    RetrofitClient retrofitClient = RetrofitClient.getInstance();
-    MindcareApi mindcareApi = RetrofitClient.getRetrofitInterface();
-
-    // 검사 유형
-    String testType = null;
-    String tempValue = null;
-    String voiceValue = null;
-    String phq9Value = null;
-    String testtime = null;
-    int phq9score = 0;
-
-    LocalDateTime today = LocalDateTime.now();
+    private IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
 
     // 안드로이드 뒤로가기 버튼 기능
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
+
+    private TextView title;
+    private static int nextCount = 0;
+
+    private List<Survey> surveys;
+
+    private static Map<Long, List<SurveyResult>> surveyResultMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
 
-        back = findViewById(R.id.back);
-        btnNext = findViewById(R.id.btnNext);
+        Intent intent = getIntent();
+
+        // 상위 Activity 에서 설문 조사 Index 전달
+        Long surveyId = intent.getLongExtra("surveyId", -1);
+        Boolean newSurvey = intent.getBooleanExtra("newSurvey", false);
+        if(newSurvey)
+            surveyResultMap.clear();
+
+        // 하위 Activity(설문 조사) 에서 객체 전달
+        List<SurveyResult> request = (List<SurveyResult>) intent.getSerializableExtra("surveyResult");
+        if (request != null) {
+            for (SurveyResult surveyResult : request) {
+
+                Long id = surveyResult.getSubSurveyId();
+                if (!surveyResultMap.containsKey(id)) {
+                    surveyResultMap.put(id, new ArrayList<>());
+                }
+
+                List<SurveyResult> result = surveyResultMap.get(id);
+                result.add(surveyResult);
+                surveyResultMap.put(id, result);
+            }
+        }
+
+        drawSurveyListLayout(surveyId);
+
+        LinearLayout back = findViewById(R.id.back);
+
         title = findViewById(R.id.title);
-        check_box_1 = findViewById(R.id.check_box_1);
-        check_box_3 = findViewById(R.id.check_box_3);
-        check1 = findViewById(R.id.check1);
-        check3 = findViewById(R.id.check3);
-        check1_comment = findViewById(R.id.check1_comment);
-        check3_comment = findViewById(R.id.check3_comment);
-        checklist_date = findViewById(R.id.checklist_date);
-        check_end1 = findViewById(R.id.check_end1);
-        check_end1_2 = findViewById(R.id.check_end1_2);
-        check_end1_3 = findViewById(R.id.check_end1_3);
-        check_end1_4 = findViewById(R.id.check_end1_4);
-        check_end2 = findViewById(R.id.check_end2);
-        check_icon_1 = findViewById(R.id.check_icon_1);
-        check_icon_3 = findViewById(R.id.check_icon_3);
+        AppCompatButton btnNext = findViewById(R.id.btnNext);
 
-        check_icon_1.setVisibility(View.INVISIBLE);
-        check_icon_3.setVisibility(View.INVISIBLE);
+        TextView todayDate = findViewById(R.id.todayDate);
 
-        check_end1.setVisibility(View.GONE);
-        check_end1_2.setVisibility(View.GONE);
-        check_end1_3.setVisibility(View.GONE);
-        check_end1_4.setVisibility(View.GONE);
-        check_end2.setVisibility(View.GONE);
+        LinearLayout survey_response = findViewById(R.id.survey_response);
 
+        survey_response.setVisibility(View.INVISIBLE);
 
-        // 오늘 날짜
-        testtime = Global.DATETIME_FORMATTER.format(today);
-        checklist_date.setText(Global.DATE_FORMATTER.format(today));
+        todayDate.setText(Global.dateToString(Global.DATE_FORMATTER2));
 
         // 뒤로가기 리스너
         back.setOnClickListener(view -> finish());
 
-        // 검사 유형에 따라 안내 화면 설정
-        Intent intent = getIntent();
-        tempValue = getIntent().getStringExtra("tempValue");
-        voiceValue = getIntent().getStringExtra("voiceValue");
-        testType = intent.getStringExtra("testType");
-        phq9score = intent.getIntExtra("phq9score", 0);
-        String results = intent.getStringExtra("results");
-        String type = intent.getStringExtra("Type");
-
-        title.setText("오전 검사 안내");
-        check1_comment.setVisibility(View.VISIBLE);
-//            check_box_1.setBackgroundResource(R.drawable.layout_bg_pink);
-//            check1.setTextColor(Color.WHITE);
-
-        /* 음성파일 시작 화면에서 재생*/
-        if (Global.btnVoice) {
-            mediaPlayer = MediaPlayer.create(GuideActivity.this, R.raw.test_start); //220922 soyi Kim
-            mediaPlayer.start(); //220922 soyi Kim
-        }
-
-
-
-        // 결과화면일때
-        if (testType.equals("AM4")) {
-//            long startTime = intent.getLongExtra("time",0);
-//            long endTime = System.currentTimeMillis();
-//            int requiredTime = ((int) (endTime-startTime) )/1000;
-            title.setText("오전 검사 종료");
-            check_icon_1.setVisibility(View.VISIBLE);
-            check_icon_3.setVisibility(View.VISIBLE);
-            check_end1.setVisibility(View.VISIBLE);
-            check_end1_2.setVisibility(View.VISIBLE);
-            check_end1_3.setVisibility(View.VISIBLE);
-            check_end1_4.setVisibility(View.VISIBLE);
-            check_end2.setVisibility(View.VISIBLE);
-            SharedPreferences sharedPreferences = getSharedPreferences("Test", MODE_PRIVATE);
-            phq9Value = sharedPreferences.getString("PHQ9", null);
-            Log.d("DDDDDD", phq9Value + "");
-//            Score score = new Score(this,Integer.parseInt(tempValue),Integer.parseInt(voiceValue),Integer.parseInt(phq9Value));
-//            String[] resultValue = score.getOneWeekResult();
-//            Integer totalScore = Integer.parseInt(resultValue[2]);
-//            Log.d("TOTALDATA",tempValue+"/"+voiceValue+"/"+phq9Value+"/"+totalScore);
-//            check_end1.setText("기분 온도 : "+tempValue+"점   |  음성 테스트 결과 : "+(voiceValue.equals("0")?"보통":"주의"));
-            check_end1_2.setText(tempValue + "점");
-
-//            UserData userData = new UserData(Global.TOKEN.getId(), "AM", Integer.parseInt(tempValue), Integer.parseInt(voiceValue)); //
-//            setUserData(userData);
-            btnNext.setText("확인");
-
-            /* 음성파일 종료 화면에서 재생*/
-            if (Global.btnVoice) {
-                mediaPlayer = MediaPlayer.create(GuideActivity.this, R.raw.test_end); //220922 soyi Kim
-                mediaPlayer.start(); //220922 soyi Kim
-            }
-
-
-        }
-
         btnNext.setOnClickListener(view -> {
-            if (testType.equals("AM1")) {
-                // 오전 온도계로 이동
-                Intent intent2 = new Intent(getApplicationContext(), TemperatureAMActivity.class);
-//                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-                startActivity(intent2);
-//                overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit);
-
-            } else if (testType.equals("AM2")) {
-                // 오전 음성1
-                Intent intent2 = new Intent(getApplicationContext(), RecordAMActivity.class);
-                intent2.putExtra("tempValue", intent.getStringExtra("tempValue"));
-                startActivity(intent2);
-
-            } else if (testType.equals("AM4")) {
-                // 홈화면으로 이동
-
-
-
-                sendSurveyRequest(Global.TOKEN.getId(), 5L, tempValue, Global.strDate);
-
-
-
-            }
+            makeSurveyResultRequest(surveyResultMap);
         });
-
-//        // 확인 리스너
-//        btnNext.setOnClickListener(view -> {
-//            Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(intent2);
-//        });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        /* 음성파일 화면 벗어나면 정지 */
-        if(mediaPlayer != null){
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-        }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Global.checkedNetwork(this);
-    }
-
-
-/*
-    //onCreate()안에 선언했으면 이부분 없애야 함.
-    //220922 soyi Kim
-    @Override
-    protected void onPause() {
-        super.onPause();
-        *//* 음성파일 화면 벗어나면 정지 *//*
-        mediaPlayer.stop();
-        mediaPlayer.reset();
-    }*/
-
-//    //220922 soyi Kim
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        /* 음성파일 시스템 리소스 정리 (런타임 오류나서 숨김처리함) */
-//        mediaPlayer.release();
-//    }
-
-//    @Override
-//    public void onBackPressed() {
-//        backKeyHandler.onBackPressed();
-//    }
-
-
-    public void sendSurveyRequest(Long subjectId, Long surveyId, String answer, String surveyAt){
-
-        String endpoint = "survey/result";
-        String postUrl = Global.AI_SERVER_URL+endpoint;
-//        String postUrl= "http://"+ipv4Address+":"+portNumber+"/"+endpoint;
-
-        File mergePath = new File(getExternalCacheDir().getAbsolutePath()+"/test1.wav");
-
-        RequestBody postBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("subjectId", subjectId.toString())
-                .addFormDataPart("surveyId", surveyId.toString())
-                .addFormDataPart("surveyAt", surveyAt)
-                .addFormDataPart("answer",answer)
-                .build();
-
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(postUrl)
-                .post(postBody)
-                .build();
-        client.newCall(request).enqueue(new okhttp3.Callback() {
+    public void drawSurveyListLayout(Long surveyId) {
+        iEmaService.getSurveyInfo(surveyId).enqueue(new Callback<Survey>() {
             @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                // Cancel the post on failure.
-                call.cancel();
-
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, final okhttp3.Response response) {
-                // In order to access the TextView inside the UI thread, the code is executed inside runOnUiThread()
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            }
-        });
-
-    }
-
-
-    public void setUserData(UserData userData) {
-        retrofitClient = RetrofitClient.getInstance();
-        mindcareApi = RetrofitClient.getRetrofitInterface();
-        mindcareApi.setUserData("Bearer " + Global.TOKEN.getToken(), userData).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Survey> call, @NonNull Response<Survey> response) {
                 if (response.isSuccessful()) {
-                    Log.d("GETUSERDATA", response.isSuccessful()+"");
-                    Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent2);
+                    Survey result = response.body();
 
+                    title.setText(result.getQuestion());
+                    surveys = result.getChildren();
+
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                    for (Survey survey : surveys) {
+                        fragmentTransaction.add(R.id.list, new GuideItemFragment(getApplicationContext(), survey, surveyId, SurveyActivity.class));
+                    }
+
+                    fragmentTransaction.commit();
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "서버와 연결이 불안정합니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                Log.d("GETUSERDATA", t.toString());
+            public void onFailure(@NonNull Call<Survey> call, Throwable t) {
+                Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    public void makeSurveyResultRequest(Map<Long, List<SurveyResult>> resultMap) {
+
+        List<MultipartBody.Part> files = new ArrayList<>();
+        Map<String, RequestBody> requestMap = new HashMap<>();
+
+        for (Long key : resultMap.keySet()) {
+            List<SurveyResult> results = resultMap.get(key);
+
+            if (results == null || results.size() == 0) continue;
+
+            requestMap.put("surveySubjectId", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSurveySubjectId().toString()));
+            requestMap.put("subSurveyId", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSubSurveyId().toString()));
+            requestMap.put("surveyAt", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSurveyAt()));
+
+            for (SurveyResult result : results) {
+                String filePath = result.getFilePath();
+                String answer = result.getAnswer();
+                if (answer != null)
+                    requestMap.put("answer", RequestBody.create(MediaType.parse("text/plain"), result.getAnswer()));
+                else if (filePath != null) {
+                    String fileName = filePath.substring(filePath.lastIndexOf("/"));
+                    RequestBody fileBody = RequestBody.create(MultipartBody.FORM, filePath);
+
+                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("files", fileName, fileBody);
+                    files.add(filePart);
+                }
+            }
+
+            sendSurveyResultRequest(files, requestMap);
+
+            requestMap.clear();
+            files.clear();
+        }
+    }
+
+    private void sendSurveyResultRequest(List<MultipartBody.Part> files, Map<String, RequestBody> requestMap) {
+
+        iEmaService.saveSurvey(files, requestMap).enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    moveToActivity(MainActivity.class, surveys.get(nextCount));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, Throwable t) {
+                Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getSurveyInfo() {
+        iEmaService.getSurveyInfo(Global.TOKEN.getSurveyId()).enqueue(new Callback<Survey>() {
+            @Override
+            public void onResponse(@NonNull Call<Survey> call, @NonNull Response<Survey> response) {
+                if (response.isSuccessful()) {
+                    Survey result = response.body();
+                    surveys = result.getChildren();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Survey> call, Throwable t) {
+                Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void moveToActivity(Class clazz, Survey data) {
+        Intent intent = new Intent(getApplicationContext(), clazz);
+        intent.putExtra("surveyInfo", data);
+        startActivity(intent);
+    }
 }

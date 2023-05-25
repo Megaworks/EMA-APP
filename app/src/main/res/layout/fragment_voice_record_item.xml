@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="32dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.6">
+
+            <ImageView
+                android:id="@+id/text_bubble"
+                android:layout_width="match_parent"
+                android:layout_height="198dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/text_bubble2_1" />
+
+            <TextView
+                android:id="@+id/recordComment"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="-20dp"
+                android:padding="50dp"
+                android:layout_marginRight="-10dp"
+                android:gravity="center"
+                android:lineHeight="20dp"
+                android:paddingHorizontal="30dp"
+                android:text="오늘 힘들고 지쳤던 일이 있다면 솔직하게 이야기 해볼까요?"
+                android:textColor="@color/title_color_purple_text3"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/testImg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="-70dp"
+            android:layout_weight="1"
+            android:scaleType="fitEnd"
+            android:src="@drawable/frued5" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:lineHeight="23dp"
+            android:text="녹음 버튼을 누르고 말씀하시고,\n일시정지 버튼을 누른 뒤\n오른쪽 업로드 버튼을 눌러주세요."
+            android:textAlignment="center"
+            android:textColor="@color/black3"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/recodingTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="50dp"
+            android:text="0:00"
+            android:textAlignment="center"
+            android:textColor="@color/title_color_purple1_1"
+            android:textSize="34dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="70dp"
+            android:layout_marginBottom="40dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/reset"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_layout_circle_white"
+                android:backgroundTint="@color/light_gray3"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="17dp"
+                    android:src="@drawable/reset_icon" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_layout_circle_white"
+                android:backgroundTint="@color/light_gray3"
+                android:gravity="center">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="4dp"
+                        android:background="@drawable/bg_layout_circle_white" />
+
+                    <ImageView
+                        android:id="@+id/record_pause"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_layout_circle_purple_gradient" />
+
+                    <ImageView
+                        android:id="@+id/record2_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="20dp"
+                        android:background="@drawable/pause_icon"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/upload"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_layout_circle_white"
+                android:backgroundTint="@color/light_gray3"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/upload_icon" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

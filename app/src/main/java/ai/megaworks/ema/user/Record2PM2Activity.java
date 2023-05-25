@@ -23,9 +23,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -361,13 +358,13 @@ public class Record2PM2Activity extends AppCompatActivity {
 //        String ipv4Address = "133.186.251.245";
 //        String portNumber = "5001";
         String endpoint = "upload";
-        String postUrl = Global.AI_SERVER_URL+endpoint;
+        String postUrl = Global.API_SERVER_URL +endpoint;
 //        String postUrl= "http://"+ipv4Address+":"+portNumber+"/"+endpoint;
 //        File mergePath = new File(getExternalCacheDir().getAbsolutePath()+"/merge.wav");
         File mergePath = new File(getExternalCacheDir().getAbsolutePath()+"/test2.wav");
         RequestBody postBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", Global.TOKEN.getId()+"_"+Global.strDate+"_"+"PM2_good.wav",RequestBody.create(MultipartBody.FORM, mergePath))
+                .addFormDataPart("file", Global.TOKEN.getSubjectId()+"_"+Global.defaultDateStr +"_"+"PM2_good.wav",RequestBody.create(MultipartBody.FORM, mergePath))
                 .build();
         postRequest(postUrl, postBody);
     }
@@ -646,7 +643,6 @@ public class Record2PM2Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Global.checkedNetwork(this);
     }
 
 }

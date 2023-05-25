@@ -8,95 +8,138 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import ai.megaworks.ema.api.LoginRequest;
-import ai.megaworks.ema.api.LoginResponse;
-import ai.megaworks.ema.api.MindcareApi;
-import ai.megaworks.ema.api.RetrofitClient;
-import ai.megaworks.ema.firebase.FirebaseMessagingService;
+import ai.megaworks.ema.domain.subject.LoginRequest;
+import ai.megaworks.ema.domain.subject.LoginResponse;
+import ai.megaworks.ema.domain.IEmaService;
+import ai.megaworks.ema.domain.RetrofitClient;
+import ai.megaworks.ema.domain.survey.SurveySubjectRequest;
+import ai.megaworks.ema.domain.survey.SurveySubjectResponse;
 import ai.megaworks.ema.user.BackKeyHandler;
 import ai.megaworks.ema.user.MainActivity;
-import ai.megaworks.ema.user.TempPasswordActivity;
+import ai.megaworks.ema.user.PreSurveyActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private AppCompatButton btnLogin;
-    private EditText loginId, loginInspectId, loginUserTel;
-    String TAG = "LoginActivityTAG";
+    private final String TAG = this.getClass().getName();
+
+    private RetrofitClient retrofitClient = RetrofitClient.getInstance();
+    private IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
 
     // 안드로이드 뒤로가기 버튼 기능
-    private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
+    private final BackKeyHandler backKeyHandler = new BackKeyHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginId = findViewById(R.id.loginId);
-        loginInspectId = findViewById(R.id.loginInspectId);
-        loginUserTel = findViewById(R.id.loginUserTel);
+        // 자동 로그인 확인하기 위함
+        SharedPreferences sharedPreferences = getSharedPreferences("USERINFO", MODE_PRIVATE);
 
-        btnLogin = findViewById(R.id.btnLogin);
+        if (sharedPreferences.getLong("subjectId", 0L) != 0L) {
+            Long subjectIdInfo = sharedPreferences.getLong("subjectId", 0L);
+            String subjectTelInfo = sharedPreferences.getString("subjectTel", null);
+            String inspectIdInfo = sharedPreferences.getString("inspectId", null);
+            Global.TOKEN.setSubjectId(subjectIdInfo);
+            Global.TOKEN.setInspectId(subjectTelInfo);
+            Global.TOKEN.setSubjectTel(inspectIdInfo);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("TOKEN", MODE_PRIVATE);
-
-        Long id = sharedPreferences.getLong("Id", 0L);
-        // 저장된 ID 불러옴옴
-        if (id != 0L) {
-            loginId.setText(id.toString());
+            login(subjectIdInfo, inspectIdInfo, subjectTelInfo);
         }
 
-        if (sharedPreferences.getString("Token", null) != null) {
-            Long userid = sharedPreferences.getLong("Id", 0L);
-            String userType = sharedPreferences.getString("UserType", null);
-            String userName = sharedPreferences.getString("UserName", null);
-            Global.TOKEN.setId(userid);
-            Global.TOKEN.setUserName(userName);
-            Global.TOKEN.setUserType(userType);
-            ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-//                if (userType.equals("U")){
-//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                    startActivity(intent);
-//                }else if (userType.equals("A")){
-//                    Intent intent = new Intent(getApplicationContext(), AdminMainActivity.class);
-//                    startActivity(intent);
-//                }
-            } else {
-                Toast.makeText(getApplicationContext(), "네트워크 연결을 확인해주세요.", Toast.LENGTH_SHORT).show();
-            }
+        EditText subjectId = findViewById(R.id.loginSubjectId);
+        EditText inspectId = findViewById(R.id.loginInspectId);
+        EditText subjectTel = findViewById(R.id.loginSubjectTel);
 
+        AppCompatButton btnLogin = findViewById(R.id.btnLogin);
 
-        }
-        // 메인으로 이동
         btnLogin.setOnClickListener(view -> {
             ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
             if (networkInfo == null) {
-                Toast.makeText(getApplicationContext(), "네트워크 연결을 확인해주세요.", Toast.LENGTH_SHORT).show();
-            } else {
-                LoginService();
+                Toast.makeText(getApplicationContext(), getString(R.string.permission_denied_network), Toast.LENGTH_SHORT).show();
             }
-//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(intent);
+            login(Long.parseLong(subjectId.getText().toString()), inspectId.getText().toString(), subjectTel.getText().toString());
         });
 
+
+    }
+
+    public void login(Long subjectId, String inspectId, String subjectTel) {
+
+        LoginRequest loginRequest = new LoginRequest(subjectId, inspectId, subjectTel);
+        iEmaService.getLoginResponse(loginRequest).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                Log.d(TAG, response.isSuccessful() + "");
+                if (response.isSuccessful()) {
+                    LoginResponse loginResponse = response.body();
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("USERINFO", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                    editor.putLong("subjectId", subjectId);
+                    editor.putString("subjectTel", subjectTel);
+                    editor.putString("inspectId", inspectId);
+                    editor.commit();
+
+                    Global.TOKEN.setSubjectId(loginResponse.getId());
+                    Global.TOKEN.setSubjectTel(loginResponse.getPhoneNumber());
+                    Global.TOKEN.setInspectId(loginResponse.getUserId());
+                    Global.TOKEN.setSubjectName(loginResponse.getName());
+
+                    // TODO : 설문조사가 한개인 경우이기 때문에 surveyId 고정
+                    checkPreSurveyCompleted(subjectId, 1L);
+                } else {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), getString(R.string.permission_denied_network), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void checkPreSurveyCompleted(Long subjectId, Long surveyId) {
+        SurveySubjectRequest request = SurveySubjectRequest.builder()
+                .subjectId(subjectId)
+                .surveyId(surveyId).build();
+        iEmaService.checkValidSubject(request).enqueue(new Callback<SurveySubjectResponse>() {
+            @Override
+            public void onResponse(Call<SurveySubjectResponse> call, Response<SurveySubjectResponse> response) {
+                if (response.isSuccessful()) {
+                    SurveySubjectResponse result = response.body();
+                    Global.TOKEN.setSurveySubjectId(result.getId());
+                    Global.TOKEN.setSurveyId(surveyId);
+                    if (result.isFinishedPreSurvey()) {
+                        moveToActivity(MainActivity.class);
+                    } else {
+                        moveToActivity(PreSurveyActivity.class);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SurveySubjectResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void moveToActivity(Class clazz) {
+        Intent intent = new Intent(getApplicationContext(), clazz);
+        startActivity(intent);
     }
 
     @Override
@@ -104,84 +147,5 @@ public class LoginActivity extends AppCompatActivity {
         backKeyHandler.onBackPressed();
     }
 
-    public void AutoLogin() { // Token 받아서 처리
-        SharedPreferences sharedPreferences = getSharedPreferences("File", MODE_PRIVATE);
-        String token = sharedPreferences.getString("Token", null);
-        if (token != null) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        }
-    }
-
-    public void LoginService() {
-        Long subjectId = Long.parseLong(loginId.getText().toString());
-        String inspectId = loginInspectId.getText().toString();
-        String subjectTel = loginUserTel.getText().toString();
-
-        LoginRequest loginRequest = new LoginRequest(subjectId, inspectId, subjectTel);
-
-        RetrofitClient retrofitClient = RetrofitClient.getInstance();
-        MindcareApi mindcareApi = RetrofitClient.getRetrofitInterface();
-        SharedPreferences sharedPreferences = getSharedPreferences("TOKEN", MODE_PRIVATE);
-        // 로그인시 저장된 Token 있으면 메인으로
-        if (sharedPreferences.getString("Token", null) != null) {
-            Long userid = sharedPreferences.getLong("Id", 0L);
-            String userName = sharedPreferences.getString("UserName", null);
-            String userType = sharedPreferences.getString("UserType", null);
-            String userPhoneNumber = sharedPreferences.getString("UserTel", null);
-            Global.TOKEN.setId(userid);
-            Global.TOKEN.setUserName(userName);
-            Global.TOKEN.setUserType(userType);
-            Global.TOKEN.setUserTel(userPhoneNumber);
-
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        } else {
-            mindcareApi.getLoginResponse(loginRequest).enqueue(new Callback<LoginResponse>() {
-                @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                    Log.d(TAG, "" + response.isSuccessful());
-                    if (response.isSuccessful()) {
-                        LoginResponse result = response.body();
-
-                        SharedPreferences sharedPreferences = getSharedPreferences("TOKEN", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putLong("Id", subjectId);
-                        editor.putString("UserTel", subjectTel);
-                        editor.putString("UserType", result.getGroupId());
-                        editor.putString("UserName", result.getName());
-                        editor.commit();
-
-                        Global.TOKEN.setId(subjectId);
-                        Global.TOKEN.setUserName(result.getName());
-                        Global.TOKEN.setUserType(result.getGroupId());
-                        Global.TOKEN.setUserTel(result.getPhoneNumber());
-
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-
-//                        if (result.getUsertype().equals("U")){
-//                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                            startActivity(intent);
-//                        }else if (result.getUsertype().equals("A")){
-//                            Intent intent = new Intent(getApplicationContext(), AdminMainActivity.class);
-//                            startActivity(intent);
-//                        }
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "아이디, 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
-//                    Toast.makeText(getApplicationContext(),"인터넷 연결을 확인해주세요.",Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-
-    }
 }
 
