@@ -153,7 +153,7 @@ public class GuideActivity extends AppCompatActivity {
                 if (answer != null)
                     requestMap.put("answer", RequestBody.create(MediaType.parse("text/plain"), result.getAnswer()));
                 else if (filePath != null) {
-                    String fileName = filePath.substring(filePath.lastIndexOf("/"));
+                    String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
                     RequestBody fileBody = RequestBody.create(MultipartBody.FORM, filePath);
 
                     MultipartBody.Part filePart = MultipartBody.Part.createFormData("files", fileName, fileBody);
