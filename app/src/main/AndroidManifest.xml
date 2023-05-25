@@ -25,51 +25,11 @@
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="ai.megaworks.ema.user.TemperatureActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.TemperatureAMActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.TemperaturePMActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name="ai.megaworks.ema.user.MyPageActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.PreSurveyActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.RecordActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.RecordAMActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.RecordAM2Activity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.RecordPMActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.RecordPM2Activity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.Record2PMActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name="ai.megaworks.ema.user.Record2PM2Activity"
             android:exported="true"
             android:screenOrientation="portrait"/>
 
