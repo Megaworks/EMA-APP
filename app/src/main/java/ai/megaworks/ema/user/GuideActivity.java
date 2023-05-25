@@ -62,7 +62,7 @@ public class GuideActivity extends AppCompatActivity {
         // 상위 Activity 에서 설문 조사 Index 전달
         Long surveyId = intent.getLongExtra("surveyId", -1);
         Boolean newSurvey = intent.getBooleanExtra("newSurvey", false);
-        if(newSurvey)
+        if (newSurvey)
             surveyResultMap.clear();
 
         // 하위 Activity(설문 조사) 에서 객체 전달

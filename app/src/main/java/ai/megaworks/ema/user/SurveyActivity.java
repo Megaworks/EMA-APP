@@ -10,17 +10,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -114,7 +110,7 @@ public class SurveyActivity extends AppCompatActivity {
                             fragment = new TemperatureItemFragment(getApplicationContext(), survey);
                         } else if (type.equals("RECORD")) {
                             fragment = new VoiceRecordItemFragment(getApplicationContext(), survey, getExternalCacheDir().getAbsolutePath());
-                        } else  if(type.equals("RANGE"))  {
+                        } else if (type.equals("RANGE")) {
                             fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), survey);
                         }
                         fragmentTransaction.add(R.id.list, fragment);

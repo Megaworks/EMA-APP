@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                    for (Survey survey: surveys) {
+                    for (Survey survey : surveys) {
                         fragmentTransaction.add(R.id.list, new SurveyButtonItemFragment(getApplicationContext(), survey, GuideActivity.class));
                     }
 

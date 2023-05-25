@@ -18,11 +18,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
-import ai.megaworks.ema.domain.firebase.FirebaseTokenInfo;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
+import ai.megaworks.ema.domain.firebase.FirebaseTokenInfo;
 import ai.megaworks.ema.domain.survey.SurveySubjectRequest;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

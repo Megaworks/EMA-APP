@@ -17,7 +17,6 @@
         android:elevation="5dp"
         android:orientation="horizontal">
 
-        <!-- 완료 아이콘 -->
         <TextView
             android:id="@+id/survey"
             android:layout_width="match_parent"

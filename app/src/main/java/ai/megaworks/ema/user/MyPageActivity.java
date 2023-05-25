@@ -1,7 +1,6 @@
 package ai.megaworks.ema.user;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,19 +13,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
 
 
-public class MyPageActivity extends AppCompatActivity{
+public class MyPageActivity extends AppCompatActivity {
 
     private AppCompatButton male, female, password1, signUp, email_check;
     private LinearLayout back, mymessage;
-    private EditText name, email, nickname ;
+    private EditText name, email, nickname;
     private String gender;
-    private String getEmail="";
+    private String getEmail = "";
     private TextView id, birthday, age, user_delete;
     public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     RetrofitClient retrofitClient = RetrofitClient.getInstance();
@@ -41,8 +39,7 @@ public class MyPageActivity extends AppCompatActivity{
     private String today = dateFormat.format(curDate);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mypage);
 
