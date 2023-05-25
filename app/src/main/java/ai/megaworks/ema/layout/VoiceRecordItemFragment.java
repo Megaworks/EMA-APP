@@ -138,7 +138,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         binding.upload.setOnClickListener(v -> {
 
             File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
-            if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT);
+            if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT).show();
             File newPath = new File(savePath + "/" + baseFileName + ".wav");
 
             try {
@@ -237,7 +237,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
                 setRecodingButton(isRecording);
 
                 File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
-                if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT);
+                if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT).show();
                 File newPath = new File(savePath + "/" + baseFileName + ".wav");
 
                 try {
