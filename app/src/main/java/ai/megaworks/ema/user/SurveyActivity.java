@@ -121,7 +121,7 @@ public class SurveyActivity extends AppCompatActivity {
                         fragments.add(fragment);
                     }
 
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitAllowingStateLoss();
                 }
             }
 

@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         fragmentTransaction.add(R.id.list, new SurveyButtonItemFragment(getApplicationContext(), survey, GuideActivity.class));
                     }
 
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitAllowingStateLoss();
                 }
             }
 

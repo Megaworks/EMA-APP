@@ -121,7 +121,7 @@ public class GuideActivity extends AppCompatActivity {
                         fragmentTransaction.add(R.id.list, new GuideItemFragment(getApplicationContext(), survey, surveyId, SurveyActivity.class));
                     }
 
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitAllowingStateLoss();
                 }
             }
 
