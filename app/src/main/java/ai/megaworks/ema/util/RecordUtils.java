@@ -1,6 +1,7 @@
 package ai.megaworks.ema.util;
 
 import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -11,6 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class RecordUtils {
 
@@ -112,7 +117,7 @@ public class RecordUtils {
     }
 
     private static void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,
-                                     long totalDataLen, long longSampleRate, int channels, long byteRate)
+                                            long totalDataLen, long longSampleRate, int channels, long byteRate)
             throws IOException {
         int RECORDER_BPP = 16;
         byte[] header = new byte[44];
@@ -175,5 +180,75 @@ public class RecordUtils {
             sData[i] = 0;
         }
         return bytes;
+    }
+
+    public static void combineRecordFile(String savePath, String filePath1, String filePath2) {
+
+//        int RECORDER_BPP = 16;
+        int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+
+        long totalAudioLen, totalDataLen;
+
+        long longSampleRate = RECORDER_SAMPLERATE;
+        int channels = 1;
+
+//        long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
+        long byteRate = RECORDER_SAMPLERATE * 2;
+
+        byte[] data = new byte[bufferSize];
+
+        try (FileInputStream in1 = new FileInputStream(filePath1);
+             FileInputStream in2 = new FileInputStream(filePath2);
+             FileOutputStream out = new FileOutputStream(savePath)) {
+
+            totalAudioLen = in1.getChannel().size() + in2.getChannel().size();
+            totalDataLen = totalAudioLen + 36;
+
+            WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
+                    longSampleRate, channels, byteRate);
+
+            while (in1.read(data) != -1) {
+                out.write(data);
+            }
+            while (in2.read(data) != -1) {
+                out.write(data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static File combineRecordFiles(String savePath, List<String> filePaths) {
+
+        if (filePaths.size() == 0) {
+            return null;
+        }
+
+        // 임시 저장 파일 명 지정
+        String tempSavePath = savePath + "_temp";
+        for (int i = 0; i < filePaths.size() - 1; i++) {
+            String filePath1 = filePaths.get(i);
+            String filePath2 = filePaths.get(i + 1);
+
+            combineRecordFile(tempSavePath, filePath1, filePath2);
+            filePaths.set(i + 1, tempSavePath);
+        }
+
+        // 파일 이름 변경
+        Path file, newFile;
+
+        if (filePaths.size() < 2) {
+            file = Paths.get(filePaths.get(0));
+        } else {
+            file = Paths.get(tempSavePath);
+        }
+        newFile = Paths.get(savePath);
+
+        try {
+            Path newFilePath = Files.move(file, newFile);
+            return newFilePath.toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

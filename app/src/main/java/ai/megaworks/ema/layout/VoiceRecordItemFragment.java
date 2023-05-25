@@ -22,9 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,11 +37,8 @@ import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.databinding.FragmentVoiceRecordItemBinding;
 import ai.megaworks.ema.dialog.ProgressDialog;
-import ai.megaworks.ema.domain.IEmaService;
-import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
-import ai.megaworks.ema.user.GuideActivity;
 import ai.megaworks.ema.util.RecordUtils;
 
 public class VoiceRecordItemFragment extends CustomSurveyFragment {
@@ -54,15 +51,15 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
 
     private FragmentVoiceRecordItemBinding binding = null;
 
-    private final RetrofitClient retrofitClient = RetrofitClient.getInstance();
-    private final IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
-
     private AudioRecord recorder = null;
     private Thread recordingThread = null;
     private boolean isRecording = false;
     private int recordingTime = 0;
 
-    private String fileName = Global.dateToString(Global.DATETIME_FORMATTER3);
+    private List<String> filePaths = new ArrayList<>();
+
+    private int fileCount = 0;
+    private String baseFileName = Global.dateToString(Global.DATETIME_FORMATTER3);
 
     public VoiceRecordItemFragment(Context context, Survey survey) {
         this.context = context;
@@ -70,6 +67,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         this.surveyResult.setSubSurveyId(survey.getId());
         this.surveyResult.setSurveySubjectId(Global.TOKEN.getSurveySubjectId());
         this.surveyResult.setSurveyAt(Global.defaultDateStr);
+        baseFileName = Global.TOKEN.getSubjectId() + "_" + survey.getId() + "_" + baseFileName;
     }
 
     public VoiceRecordItemFragment(Context context, Survey survey, Class clazz) {
@@ -96,8 +94,8 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        customProgressDialog = new ProgressDialog(context);
-        customProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+//        customProgressDialog = new ProgressDialog(context);
+//        customProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         binding = FragmentVoiceRecordItemBinding.inflate(inflater, container, false);
 
@@ -123,6 +121,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
                 timeHandler.removeMessages(0);
                 binding.recodingTime.setText("0:00");
                 isRecording = false;
+                filePaths.clear();
                 dialog.dismiss();
             });
             dialog.findViewById(R.id.cancel).setOnClickListener(v -> {
@@ -137,8 +136,10 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         });
 
         binding.upload.setOnClickListener(v -> {
-            File rawPath = new File(savePath + "/" + fileName + ".pcm");
-            File newPath = new File(savePath + "/" + fileName + ".wav");
+
+            File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
+            if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT);
+            File newPath = new File(savePath + "/" + baseFileName + ".wav");
 
             try {
                 RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
@@ -156,7 +157,10 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
 
     private void setRecodingButton(boolean recoding) {
         if (recoding) {
-            startRecording(fileName);
+            String filePath = savePath + "/" + baseFileName + "_" + fileCount++;
+            startRecording(filePath);
+            // 시작할 때마다 파일 생성
+            filePaths.add(filePath + ".pcm");
             binding.recordPause.setBackgroundResource(R.drawable.ic_baseline_pause_24);
             timeHandler.sendEmptyMessage(0);
 
@@ -170,7 +174,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
 
     private void startRecording(String fileName) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            Toast.makeText(context, getString(R.string.permission_denied_record), Toast.LENGTH_SHORT).show();
         }
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
@@ -179,11 +183,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
 
         recorder.startRecording();
         isRecording = true;
-        recordingThread = new Thread(new Runnable() {
-            public void run() {
-                writeAudioDataToFile(fileName);
-            }
-        }, "AudioRecorder Thread");
+        recordingThread = new Thread(() -> writeAudioDataToFile(fileName), "AudioRecorder Thread");
         recordingThread.start();
     }
 
@@ -202,7 +202,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         short sData[] = new short[BUFFER_ELEMENTS2REC];
         FileOutputStream os = null;
         try {
-            os = new FileOutputStream(savePath + "/" + fileName + ".pcm");
+            os = new FileOutputStream(fileName + ".pcm");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -235,8 +235,11 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
             if (recordingTime == 31) {
                 isRecording = !isRecording;
                 setRecodingButton(isRecording);
-                File rawPath = new File(savePath + "/" + fileName + ".pcm");
-                File newPath = new File(savePath + "/" + fileName + ".wav");
+
+                File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
+                if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT);
+                File newPath = new File(savePath + "/" + baseFileName + ".wav");
+
                 try {
                     RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
                 } catch (IOException e) {

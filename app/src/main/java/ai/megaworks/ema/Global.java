@@ -20,7 +20,7 @@ public class Global {
     public final static DateTimeFormatter DATETIME_FORMATTER1 = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 a hh:mm");
     public final static DateTimeFormatter DATETIME_FORMATTER2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public final static DateTimeFormatter DATETIME_FORMATTER3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss");
+    public final static DateTimeFormatter DATETIME_FORMATTER3 = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS");
 
     public final static DateTimeFormatter DATE_FORMATTER1 = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
     public final static DateTimeFormatter DATE_FORMATTER2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
