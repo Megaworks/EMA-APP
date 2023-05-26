@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -28,6 +29,8 @@ import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.layout.GuideItemFragment;
+import ai.megaworks.ema.listener.Publisher;
+import ai.megaworks.ema.listener.Subscriber;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -35,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GuideActivity extends AppCompatActivity {
+public class GuideActivity extends AppCompatActivity implements Publisher {
 
     private final String TAG = this.getClass().getName();
 
@@ -51,7 +54,13 @@ public class GuideActivity extends AppCompatActivity {
 
     private List<Survey> surveys;
 
+    private int subSurveyCount = 0;
+
     private static Map<Long, List<SurveyResult>> surveyResultMap = new HashMap<>();
+    private final List<Subscriber> subscribers = new ArrayList<>();
+
+    private static List<Long> completedSurveyIds = new ArrayList<>();
+    private Long completedSurveyId = -1L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +72,17 @@ public class GuideActivity extends AppCompatActivity {
         // 상위 Activity 에서 설문 조사 Index 전달
         Long surveyId = intent.getLongExtra("surveyId", -1);
         Boolean newSurvey = intent.getBooleanExtra("newSurvey", false);
-        if (newSurvey)
+        if (newSurvey) {
             surveyResultMap.clear();
+            completedSurveyIds.clear();
+        }
 
         // 하위 Activity(설문 조사) 에서 객체 전달
         List<SurveyResult> request = (List<SurveyResult>) intent.getSerializableExtra("surveyResult");
-        if (request != null) {
+        completedSurveyId = intent.getLongExtra("completedSurveyId", -1);
+
+        if (request != null && completedSurveyId != -1) {
+            completedSurveyIds.add(completedSurveyId);
             for (SurveyResult surveyResult : request) {
 
                 Long id = surveyResult.getSubSurveyId();
@@ -116,10 +130,23 @@ public class GuideActivity extends AppCompatActivity {
                     surveys = result.getChildren();
 
                     FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                        @Override
+                        public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                            super.onFragmentStarted(fm, f);
+                            for (Long id : completedSurveyIds) {
+                                GuideActivity.this.notifyAll(id);
+                            }
+                        }
+                    }, false);
+
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                     for (Survey survey : surveys) {
-                        fragmentTransaction.add(R.id.list, new GuideItemFragment(getApplicationContext(), survey, surveyId, SurveyActivity.class));
+                        subSurveyCount += survey.getChildren().size();
+                        GuideItemFragment fragment = new GuideItemFragment(getApplicationContext(), survey, surveyId, SurveyActivity.class);
+                        fragmentTransaction.add(R.id.list, fragment);
+                        attach(fragment);
                     }
 
                     fragmentTransaction.commitAllowingStateLoss();
@@ -132,9 +159,15 @@ public class GuideActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     public void makeSurveyResultRequest(Map<Long, List<SurveyResult>> resultMap) {
+
+        if (resultMap.size() < subSurveyCount) {
+            Toast.makeText(getApplicationContext(), getString(R.string.warn_not_all_completed_survey), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         List<MultipartBody.Part> files = new ArrayList<>();
         Map<String, RequestBody> requestMap = new HashMap<>();
@@ -188,28 +221,21 @@ public class GuideActivity extends AppCompatActivity {
         });
     }
 
-    public void getSurveyInfo() {
-        iEmaService.getSurveyInfo(Global.TOKEN.getSurveyId()).enqueue(new Callback<Survey>() {
-            @Override
-            public void onResponse(@NonNull Call<Survey> call, @NonNull Response<Survey> response) {
-                if (response.isSuccessful()) {
-                    Survey result = response.body();
-                    surveys = result.getChildren();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Survey> call, Throwable t) {
-                Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
-                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
     private void moveToActivity(Class clazz, Survey data) {
         Intent intent = new Intent(getApplicationContext(), clazz);
         intent.putExtra("surveyInfo", data);
         startActivity(intent);
+    }
+
+    @Override
+    public void attach(Subscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    @Override
+    public void notifyAll(Long id) {
+        for (Subscriber subscriber : subscribers) {
+            subscriber.update(id);
+        }
     }
 }

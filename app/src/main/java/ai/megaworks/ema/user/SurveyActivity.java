@@ -72,6 +72,7 @@ public class SurveyActivity extends AppCompatActivity {
 
             innerIntent.putParcelableArrayListExtra("surveyResult", (ArrayList<? extends Parcelable>) surveyResults);
             innerIntent.putExtra("surveyId", parentSurveyId);
+            innerIntent.putExtra("completedSurveyId", surveyId);
             startActivity(innerIntent);
         });
 

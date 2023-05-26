@@ -7,14 +7,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
+import java.util.Objects;
 
 import ai.megaworks.ema.databinding.FragmentGuideItemBinding;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;
+import ai.megaworks.ema.listener.Subscriber;
 
-public class GuideItemFragment extends CustomSurveyFragment {
+public class GuideItemFragment extends CustomSurveyFragment implements Subscriber {
 
     private final Context context;
 
@@ -27,6 +28,7 @@ public class GuideItemFragment extends CustomSurveyFragment {
 
     private final IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
 
+    private FragmentGuideItemBinding binding;
 
     public GuideItemFragment(Context context, Survey survey, Long parentSurveyId) {
         this.context = context;
@@ -34,8 +36,8 @@ public class GuideItemFragment extends CustomSurveyFragment {
         this.parentSurveyId = parentSurveyId;
     }
 
-    public GuideItemFragment(Context context, Survey survey,  Long parentSurveyId, Class clazz) {
-       this(context, survey, parentSurveyId);
+    public GuideItemFragment(Context context, Survey survey, Long parentSurveyId, Class clazz) {
+        this(context, survey, parentSurveyId);
         this.clazz = clazz;
     }
 
@@ -47,10 +49,12 @@ public class GuideItemFragment extends CustomSurveyFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentGuideItemBinding binding = FragmentGuideItemBinding.inflate(inflater, container, false);
+        binding = FragmentGuideItemBinding.inflate(inflater, container, false);
 
         binding.survey.setText(this.survey.getQuestion());
         binding.surveyComment.setText(this.survey.getDescription());
+
+        binding.checkIcon.setVisibility(View.INVISIBLE);
 
         if (this.clazz != null) {
             binding.root.setOnClickListener(v -> {
@@ -68,4 +72,9 @@ public class GuideItemFragment extends CustomSurveyFragment {
         startActivity(intent);
     }
 
+    @Override
+    public void update(Long id) {
+        if (Objects.equals(survey.getId(), id) && binding != null)
+            binding.checkIcon.setVisibility(View.VISIBLE);
+    }
 }
