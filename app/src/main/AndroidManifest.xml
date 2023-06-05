@@ -23,6 +23,7 @@
         <activity
             android:name="ai.megaworks.ema.user.SurveyActivity"
             android:exported="true"
+            android:noHistory="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.MyPageActivity"
@@ -49,6 +50,12 @@
         <activity
             android:name="ai.megaworks.ema.user.GuideActivity"
             android:exported="true"
+            android:noHistory="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="ai.megaworks.ema.user.ManualActivity"
+            android:exported="true"
+            android:noHistory="true"
             android:screenOrientation="portrait"/>
         <service
             android:name="ai.megaworks.ema.firebase.FirebaseMessagingService"

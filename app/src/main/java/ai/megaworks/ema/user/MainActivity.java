@@ -46,6 +46,17 @@ public class MainActivity extends AppCompatActivity {
         ImageView user_btn = findViewById(R.id.user_btn);
         user_name = findViewById(R.id.user_name);
 
+        ImageView manual_btn = findViewById(R.id.manual_btn);
+
+        // TODO : 매뉴얼 설문 조사 고정
+        manual_btn.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), ManualActivity.class);
+            intent.putExtra("surveyId", 18L);
+            intent.putExtra("newSurvey", true);
+            startActivity(intent);
+        });
+
+
         // 마이 페이지
         user_btn.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(), MyPageActivity.class);

@@ -1,5 +1,6 @@
 package ai.megaworks.ema.user;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -8,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentManager;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -63,7 +66,14 @@ public class SurveyActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
 
         btnNext.setOnClickListener(view -> {
-            Intent innerIntent = new Intent(getApplicationContext(), GuideActivity.class);
+            Intent innerIntent;
+
+            // TODO : 메뉴얼 설문조사 고정 18L
+            if (parentSurveyId == 18L) {
+                innerIntent = new Intent(getApplicationContext(), ManualActivity.class);
+            } else {
+                innerIntent = new Intent(getApplicationContext(), GuideActivity.class);
+            }
 
             for (CustomSurveyFragment fragment : fragments) {
                 SurveyResult surveyResult = fragment.getSurveyResult();
@@ -138,13 +148,9 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        backKeyHandler.onBackPressed();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
     }
+
 
 }

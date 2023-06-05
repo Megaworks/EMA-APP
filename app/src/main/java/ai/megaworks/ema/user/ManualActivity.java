@@ -1,13 +1,9 @@
 package ai.megaworks.ema.user;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,14 +30,13 @@ import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.layout.GuideItemFragment;
 import ai.megaworks.ema.listener.Publisher;
 import ai.megaworks.ema.listener.Subscriber;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GuideActivity extends AppCompatActivity implements Publisher {
+public class ManualActivity extends AppCompatActivity implements Publisher {
 
     private final String TAG = this.getClass().getName();
 
@@ -58,8 +52,6 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
     private List<Survey> surveys;
 
-    private Dialog surveyResetDialog;
-
     private int subSurveyCount = 0;
 
     private static Map<Long, List<SurveyResult>> surveyResultMap = new HashMap<>();
@@ -71,7 +63,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_guide);
+        setContentView(R.layout.activity_manual);
 
         Intent intent = getIntent();
 
@@ -107,7 +99,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         LinearLayout back = findViewById(R.id.back);
 
         title = findViewById(R.id.title);
-        AppCompatButton btnNext = findViewById(R.id.btnNext);
+        AppCompatButton manualSurveyCompleted = findViewById(R.id.manualSurveyCompleted);
 
         TextView todayDate = findViewById(R.id.todayDate);
 
@@ -117,16 +109,10 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
         todayDate.setText(Global.dateToString(Global.DATE_FORMATTER2));
 
-        surveyResetDialog = new Dialog(this);
-        surveyResetDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        surveyResetDialog.setContentView(R.layout.dialog_reset);
-        surveyResetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        surveyResetDialog.setCanceledOnTouchOutside(false);
-
         // 뒤로가기 리스너
-        back.setOnClickListener(view -> onBackPressed());
+        back.setOnClickListener(view -> finish());
 
-        btnNext.setOnClickListener(view -> {
+        manualSurveyCompleted.setOnClickListener(view -> {
             makeSurveyResultRequest(surveyResultMap);
         });
     }
@@ -147,7 +133,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
                         public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
                             super.onFragmentStarted(fm, f);
                             for (Long id : completedSurveyIds) {
-                                GuideActivity.this.notifyAll(id);
+                                ManualActivity.this.notifyAll(id);
                             }
                         }
                     }, false);
@@ -174,80 +160,20 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
     }
 
-    public void makeSurveyResultRequest(Map<Long, List<SurveyResult>> resultMap) {
+    private void makeSurveyResultRequest(Map<Long, List<SurveyResult>> resultMap) {
 
         if (resultMap.size() < subSurveyCount) {
             Toast.makeText(getApplicationContext(), getString(R.string.warn_not_all_completed_survey), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        List<MultipartBody.Part> files = new ArrayList<>();
-        Map<String, RequestBody> requestMap = new HashMap<>();
-
-        for (Long key : resultMap.keySet()) {
-            List<SurveyResult> results = resultMap.get(key);
-
-            if (results == null || results.size() == 0) continue;
-
-            requestMap.put("surveySubjectId", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSurveySubjectId().toString()));
-            requestMap.put("subSurveyId", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSubSurveyId().toString()));
-            requestMap.put("surveyAt", RequestBody.create(MediaType.parse("text/plain"), results.get(0).getSurveyAt()));
-
-            for (SurveyResult result : results) {
-                String filePath = result.getFilePath();
-                String answer = result.getAnswer();
-                if (answer != null)
-                    requestMap.put("answer", RequestBody.create(MediaType.parse("text/plain"), result.getAnswer()));
-                else if (filePath != null) {
-                    String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-                    File file = new File(filePath);
-                    RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
-                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("files", fileName, fileBody);
-                    files.add(filePart);
-                }
-            }
-
-            sendSurveyResultRequest(files, requestMap);
-
-            requestMap.clear();
-            files.clear();
-        }
+        finish();
     }
 
-    private void sendSurveyResultRequest(List<MultipartBody.Part> files, Map<String, RequestBody> requestMap) {
-        nextCount++;
-        iEmaService.saveSurvey(files, requestMap).enqueue(new Callback<Boolean>() {
-            @Override
-            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if (response.isSuccessful() && subSurveyCount == nextCount) {
-                    moveToActivity(MainActivity.class);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Boolean> call, Throwable t) {
-                Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
-                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void moveToActivity(Class clazz) {
+    private void moveToActivity(Class clazz, Survey data) {
         Intent intent = new Intent(getApplicationContext(), clazz);
+        intent.putExtra("surveyInfo", data);
         startActivity(intent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        surveyResetDialog.show();
-        surveyResetDialog.findViewById(R.id.ok).setOnClickListener(v -> {
-            surveyResetDialog.dismiss();
-            finish();
-        });
-        surveyResetDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
-            surveyResetDialog.dismiss();
-        });
     }
 
     @Override
@@ -261,5 +187,4 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
             subscriber.update(id);
         }
     }
-
 }

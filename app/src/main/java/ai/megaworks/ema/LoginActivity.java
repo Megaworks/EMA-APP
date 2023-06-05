@@ -122,6 +122,10 @@ public class LoginActivity extends AppCompatActivity {
                     SurveySubjectResponse result = response.body();
                     Global.TOKEN.setSurveySubjectId(result.getId());
                     Global.TOKEN.setSurveyId(surveyId);
+//                    if(result.isDone()) {
+//                        Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
+//                        return;
+//                    } else
                     if (result.isFinishedPreSurvey()) {
                         moveToActivity(MainActivity.class);
                     } else {

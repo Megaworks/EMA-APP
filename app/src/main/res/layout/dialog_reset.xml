@@ -36,7 +36,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:text="초기화"
+            android:text="@string/dialog_title_reset_survey"
             android:textColor="@color/black1"
             android:textSize="18dp"
             android:textStyle="bold" />
@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="정말로 초기화 하시겠습니까?"
+            android:text="@string/dialog_body_reset_survey"
             android:textColor="@color/black1_1"
             android:textSize="14dp"
             android:layout_marginVertical="10dp"
