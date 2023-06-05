@@ -19,6 +19,10 @@ public class Survey implements Serializable {
 
     private String type;
 
+    private String startTime;
+
+    private String endTime;
+
     private List<Survey> children = new ArrayList<>();
 
 }

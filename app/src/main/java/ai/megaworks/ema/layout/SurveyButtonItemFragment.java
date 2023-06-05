@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
+import java.time.LocalTime;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
@@ -59,11 +59,27 @@ public class SurveyButtonItemFragment extends CustomSurveyFragment {
 
         binding.surveyQuestion.setText(this.survey.getQuestion());
 
-        checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
+        LocalTime startTime = LocalTime.parse(survey.getStartTime());
+        LocalTime endTime = LocalTime.parse(survey.getEndTime());
 
-        if (this.clazz != null) {
-            binding.root.setOnClickListener(v -> {
-                moveToActivity(this.clazz);
+        int currHour = Global.today.getHour();
+        int currMinute = Global.today.getMinute();
+
+        binding.surveyPeriod.setText(startTime.getHour() + "시 " + startTime.getMinute() + "분 ~ " + endTime.getHour() + " 시 " + endTime.getMinute() + "분 ");
+
+        if (isBetween(currHour, startTime.getHour(), endTime.getHour())) {
+            if (isBetween(currMinute, startTime.getMinute(), endTime.getMinute())) {
+                checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
+                if (this.clazz != null) {
+                    binding.root.setOnClickListener(v -> {
+                        moveToActivity(this.clazz);
+                    });
+                }
+            }
+        } else {
+            binding.frameLayout.setAlpha(0.6f);
+            binding.frameLayout.setOnClickListener(view -> {
+                Toast.makeText(context, getString(R.string.no_available_time), Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -106,6 +122,14 @@ public class SurveyButtonItemFragment extends CustomSurveyFragment {
         intent.putExtra("surveyId", this.survey.getId());
         intent.putExtra("newSurvey", true);
         startActivity(intent);
+    }
+
+
+    private boolean isBetween(int pivot, int min, int max) {
+        if (pivot >= min && pivot <= max) {
+            return true;
+        }
+        return false;
     }
 
 }
