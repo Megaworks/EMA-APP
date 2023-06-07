@@ -62,19 +62,19 @@ public class SurveyButtonItemFragment extends CustomSurveyFragment {
         LocalTime startTime = LocalTime.parse(survey.getStartTime());
         LocalTime endTime = LocalTime.parse(survey.getEndTime());
 
-        int currHour = Global.today.getHour();
-        int currMinute = Global.today.getMinute();
+        int currTime = Global.today.getHour() * 60 + Global.today.getMinute();
 
         binding.surveyPeriod.setText(startTime.getHour() + "시 " + startTime.getMinute() + "분 ~ " + endTime.getHour() + " 시 " + endTime.getMinute() + "분 ");
 
-        if (isBetween(currHour, startTime.getHour(), endTime.getHour())) {
-            if (isBetween(currMinute, startTime.getMinute(), endTime.getMinute())) {
-                checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
-                if (this.clazz != null) {
-                    binding.root.setOnClickListener(v -> {
-                        moveToActivity(this.clazz);
-                    });
-                }
+        int start = startTime.getHour() * 60 + startTime.getMinute();
+        int end = endTime.getHour() * 60 + endTime.getMinute();
+
+        if (isBetween(currTime, start, end)) {
+            checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
+            if (this.clazz != null) {
+                binding.root.setOnClickListener(v -> {
+                    moveToActivity(this.clazz);
+                });
             }
         } else {
             binding.frameLayout.setAlpha(0.6f);
