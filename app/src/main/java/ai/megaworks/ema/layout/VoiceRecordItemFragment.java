@@ -59,7 +59,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
     private List<String> filePaths = new ArrayList<>();
 
     private int fileCount = 0;
-    private String baseFileName = Global.dateToString(Global.DATETIME_FORMATTER3);
+    private String baseFileName = Global.dateToString(Global.DATE_FORMATTER3);
 
     public VoiceRecordItemFragment(Context context, Survey survey) {
         this.context = context;
@@ -67,7 +67,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         this.surveyResult.setSubSurveyId(survey.getId());
         this.surveyResult.setSurveySubjectId(Global.TOKEN.getSurveySubjectId());
         this.surveyResult.setSurveyAt(Global.defaultDateStr);
-        baseFileName = Global.TOKEN.getSubjectId() + "_" + survey.getId() + "_" + baseFileName;
+        this.baseFileName = Global.TOKEN.getSubjectId() + "_" + baseFileName + "_" + survey.getId();
     }
 
     public VoiceRecordItemFragment(Context context, Survey survey, Class clazz) {
