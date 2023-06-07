@@ -72,6 +72,19 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/voiceRecordTimeZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:lineHeight="23dp"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/black3"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/recodingTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,26 +157,6 @@
                         android:background="@drawable/pause_icon"
                         android:visibility="gone" />
                 </FrameLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:id="@+id/upload"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_layout_circle_white"
-                android:backgroundTint="@color/light_gray3"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="10dp"
-                    android:src="@drawable/upload_icon" />
             </LinearLayout>
 
         </LinearLayout>

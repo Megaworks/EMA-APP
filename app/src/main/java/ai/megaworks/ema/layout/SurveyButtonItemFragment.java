@@ -69,20 +69,26 @@ public class SurveyButtonItemFragment extends CustomSurveyFragment {
         int start = startTime.getHour() * 60 + startTime.getMinute();
         int end = endTime.getHour() * 60 + endTime.getMinute();
 
-        if (isBetween(currTime, start, end)) {
-            checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
-            if (this.clazz != null) {
-                binding.root.setOnClickListener(v -> {
-                    moveToActivity(this.clazz);
-                });
-            }
-        } else {
-            binding.frameLayout.setAlpha(0.6f);
-            binding.frameLayout.setOnClickListener(view -> {
-                Toast.makeText(context, getString(R.string.no_available_time), Toast.LENGTH_SHORT).show();
+//        if (isBetween(currTime, start, end)) {
+//            checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
+//            if (this.clazz != null) {
+//                binding.root.setOnClickListener(v -> {
+//                    moveToActivity(this.clazz);
+//                });
+//            }
+//        } else {
+//            binding.frameLayout.setAlpha(0.6f);
+//            binding.frameLayout.setOnClickListener(view -> {
+//                Toast.makeText(context, getString(R.string.no_available_time), Toast.LENGTH_SHORT).show();
+//            });
+//        }
+
+        checkAvailableSaveResult(this.survey.getId(), binding.frameLayout);
+        if (this.clazz != null) {
+            binding.root.setOnClickListener(v -> {
+                moveToActivity(this.clazz);
             });
         }
-
         return binding.root;
     }
 

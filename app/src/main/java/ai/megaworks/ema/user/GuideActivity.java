@@ -1,5 +1,6 @@
 package ai.megaworks.ema.user;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -68,10 +69,16 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
     private static List<Long> completedSurveyIds = new ArrayList<>();
     private Long completedSurveyId = -1L;
 
+    private Dialog  customProgressDialog = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.dialog_progress);
+        customProgressDialog = builder.create();
 
         Intent intent = getIntent();
 
@@ -79,6 +86,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         Long surveyId = intent.getLongExtra("surveyId", -1);
         Boolean newSurvey = intent.getBooleanExtra("newSurvey", false);
         if (newSurvey) {
+            nextCount = 0;
             surveyResultMap.clear();
             completedSurveyIds.clear();
         }
@@ -181,6 +189,8 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
             return;
         }
 
+        customProgressDialog.show();
+
         List<MultipartBody.Part> files = new ArrayList<>();
         Map<String, RequestBody> requestMap = new HashMap<>();
 
@@ -216,11 +226,12 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
     }
 
     private void sendSurveyResultRequest(List<MultipartBody.Part> files, Map<String, RequestBody> requestMap) {
-        nextCount++;
         iEmaService.saveSurvey(files, requestMap).enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                nextCount++;
                 if (response.isSuccessful() && subSurveyCount == nextCount) {
+                    customProgressDialog.dismiss();
                     moveToActivity(MainActivity.class);
                 }
             }

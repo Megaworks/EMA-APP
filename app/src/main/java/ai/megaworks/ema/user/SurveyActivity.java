@@ -1,6 +1,5 @@
 package ai.megaworks.ema.user;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,7 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentManager;
@@ -19,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -77,6 +74,8 @@ public class SurveyActivity extends AppCompatActivity {
 
             for (CustomSurveyFragment fragment : fragments) {
                 SurveyResult surveyResult = fragment.getSurveyResult();
+                if (surveyResult == null || (surveyResult.getAnswer() == null && surveyResult.getFilePath() == null))
+                    return;
                 surveyResults.add(surveyResult);
             }
 

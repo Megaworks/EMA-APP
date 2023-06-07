@@ -23,6 +23,10 @@ public class Survey implements Serializable {
 
     private String endTime;
 
+    private String minRecordTime;
+
+    private String maxRecordTime;
+
     private List<Survey> children = new ArrayList<>();
 
 }

@@ -50,7 +50,6 @@
         <activity
             android:name="ai.megaworks.ema.user.GuideActivity"
             android:exported="true"
-            android:noHistory="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name="ai.megaworks.ema.user.ManualActivity"

@@ -7,6 +7,7 @@ import static ai.megaworks.ema.util.RecordUtils.RECORDER_CHANNELS;
 import static ai.megaworks.ema.util.RecordUtils.RECORDER_SAMPLERATE;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,6 @@ import java.util.List;
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.databinding.FragmentVoiceRecordItemBinding;
-import ai.megaworks.ema.dialog.ProgressDialog;
 import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.util.RecordUtils;
@@ -47,7 +47,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
     private final Survey survey;
     private Class clazz;
     private String savePath;
-    private ProgressDialog customProgressDialog = null;
+    private Dialog customProgressDialog = null;
 
     private FragmentVoiceRecordItemBinding binding = null;
 
@@ -94,12 +94,18 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        customProgressDialog = new ProgressDialog(context);
-//        customProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(R.layout.dialog_progress);
+        customProgressDialog = builder.create();
 
         binding = FragmentVoiceRecordItemBinding.inflate(inflater, container, false);
 
         binding.recordComment.setText(survey.getDescription());
+
+        int minRecordTime = Integer.parseInt(survey.getMinRecordTime());
+        int maxRecordTime = Integer.parseInt(survey.getMaxRecordTime());
+
+        binding.voiceRecordTimeZone.setText(String.format("%02d:%02d ~ %02d:%02d", (minRecordTime / 60), (minRecordTime % 60), (maxRecordTime / 60), (maxRecordTime % 60)));
 
         if (this.clazz != null) {
             binding.root.setOnClickListener(v -> {
@@ -131,28 +137,29 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         });
 
         binding.recordPause.setOnClickListener(view -> {
+            if (recordingTime >= Integer.parseInt(survey.getMaxRecordTime())) {
+                Toast.makeText(context, getString(R.string.no_satisfied_max_record_time), Toast.LENGTH_SHORT).show();
+                return;
+            }
             isRecording = !isRecording;
             setRecodingButton(isRecording);
         });
 
-        binding.upload.setOnClickListener(v -> {
-
-            File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
-            if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT).show();
-            File newPath = new File(savePath + "/" + baseFileName + ".wav");
-
-            try {
-                RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            this.surveyResult.setFilePath(newPath.getAbsolutePath());
-
-            recordingTime = 0;
-        });
-
         return binding.root;
+    }
+
+    private void saveFile(String savePath, String baseFileName, List<String> filePaths) {
+        File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
+        if (rawPath == null)
+            Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT).show();
+        File newPath = new File(savePath + "/" + baseFileName + ".wav");
+
+        try {
+            RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.surveyResult.setFilePath(newPath.getAbsolutePath());
     }
 
     private void setRecodingButton(boolean recoding) {
@@ -232,31 +239,35 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
             Log.v("countTime", String.format("%02d:%02d", min, sec));
 
             timeHandler.sendEmptyMessageDelayed(0, 1000);
-            if (recordingTime == 31) {
+            if (recordingTime == Integer.parseInt(survey.getMaxRecordTime())) {
                 isRecording = !isRecording;
                 setRecodingButton(isRecording);
-
-                File rawPath = RecordUtils.combineRecordFiles(savePath + "/" + baseFileName, filePaths);
-                if(rawPath == null) Toast.makeText(context, getString(R.string.warn_no_data_record), Toast.LENGTH_SHORT).show();
-                File newPath = new File(savePath + "/" + baseFileName + ".wav");
-
-                try {
-                    RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                binding.recodingTime.setText("0:00");
-                recordingTime = 0;
-                timeHandler.removeMessages(0);
+                Toast.makeText(context, getString(R.string.no_satisfied_max_record_time), Toast.LENGTH_SHORT).show();
             }
         }
     };
 
     @Override
     public SurveyResult getSurveyResult() {
-        return this.surveyResult;
+        if (preCheck()) {
+            return this.surveyResult;
+        }
+        return null;
     }
+
+    private boolean preCheck() {
+        if (recordingTime < Integer.parseInt(survey.getMinRecordTime())) {
+            Toast.makeText(context, getString(R.string.no_satisfied_min_record_time), Toast.LENGTH_SHORT).show();
+        } else {
+            customProgressDialog.show();
+            saveFile(savePath, baseFileName, filePaths);
+            customProgressDialog.dismiss();
+            return true;
+        }
+
+        return false;
+    }
+
 
     private void moveToActivity(Class clazz) {
         Intent intent = new Intent(context, clazz);
