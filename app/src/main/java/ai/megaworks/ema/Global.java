@@ -1,11 +1,7 @@
 package ai.megaworks.ema;
 
-import android.os.Build;
-import android.os.StrictMode;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import ai.megaworks.ema.domain.Token;
 
@@ -30,15 +26,7 @@ public class Global {
     public static String defaultDateStr = Global.DATE_FORMATTER2.format(Global.today); //yyMMdd
     public static String jsonResult = null;
 
-    public static String dateToString(DateTimeFormatter formatter){
+    public static String dateToString(DateTimeFormatter formatter) {
         return formatter.format((today));
-    }
-
-    public static void setThread() {
-        if (Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
     }
 }
