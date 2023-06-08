@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void drawSurveyListLayout() {
-        iEmaService.getSurveyInfo(Global.TOKEN.getSurveyId()).enqueue(new Callback<Survey>() {
+        iEmaService.getSurveyInfo(Global.TOKEN.getMainSurveyId()).enqueue(new Callback<Survey>() {
             @Override
             public void onResponse(@NonNull Call<Survey> call, @NonNull Response<Survey> response) {
                 if (response.isSuccessful()) {

@@ -97,30 +97,33 @@ public class IntroActivity extends AppCompatActivity {
         });
     }
 
-    private void getSurveySubjectInfo(Long subjectId, Long surveyId) {
+    private void getSurveySubjectInfo(Long subjectId, Long surveyManagerId) {
         SurveySubjectRequest request = SurveySubjectRequest.builder()
                 .subjectId(subjectId)
-                .surveyId(surveyId).build();
+                .surveyManagerId(surveyManagerId).build();
         iEmaService.getSurveySubject(request).enqueue(new Callback<SurveySubjectResponse>() {
             @Override
             public void onResponse(Call<SurveySubjectResponse> call, Response<SurveySubjectResponse> response) {
                 if (response.isSuccessful()) {
                     SurveySubjectResponse result = response.body();
                     Global.TOKEN.setSurveySubjectId(result.getId());
-                    Global.TOKEN.setSurveyId(surveyId);
-                    if (result.isDone() && result.isFinishedPreSurvey()) {
+                    Global.TOKEN.setSurveyManagerId(surveyManagerId);
+                    Global.TOKEN.setMainSurveyId(result.getMainSurveyId());
+                    Global.TOKEN.setBaseSurveyId(result.getBaseSurveyId());
+                    Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
+                    if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
-                        return;
+                        finish();
                     } else if (result.isDone()) {
                         Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
-                        intent.putExtra("surveyId", 20L);
+                        intent.putExtra("surveyId", result.getFollowUpSurveyId());
                         intent.putExtra("newSurvey", true);
                         startActivity(intent);
                     } else if (result.isFinishedPreSurvey()) {
                         moveToActivity(MainActivity.class);
                     } else {
                         Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
-                        intent.putExtra("surveyId", 20L);
+                        intent.putExtra("surveyId", result.getBaseSurveyId());
                         intent.putExtra("newSurvey", true);
                         startActivity(intent);
                     }

@@ -13,7 +13,11 @@ public class SurveySubjectResponse {
 
     private Long subjectId;
 
-    private List<Survey> surveyList;
+    private Long mainSurveyId;
+
+    private Long baseSurveyId;
+
+    private Long followUpSurveyId;
 
     private String startAt;
 

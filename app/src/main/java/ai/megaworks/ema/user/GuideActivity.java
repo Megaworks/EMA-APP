@@ -26,13 +26,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import ai.megaworks.ema.Global;
+import ai.megaworks.ema.IntroActivity;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
+import ai.megaworks.ema.domain.survey.SurveySubjectRequest;
 import ai.megaworks.ema.layout.GuideItemFragment;
 import ai.megaworks.ema.listener.Publisher;
 import ai.megaworks.ema.listener.Subscriber;
@@ -69,7 +72,9 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
     private static List<Long> completedSurveyIds = new ArrayList<>();
     private Long completedSurveyId = -1L;
 
-    private Dialog  customProgressDialog = null;
+    private Dialog customProgressDialog = null;
+
+    private Long surveyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +88,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         Intent intent = getIntent();
 
         // 상위 Activity 에서 설문 조사 Index 전달
-        Long surveyId = intent.getLongExtra("surveyId", -1);
+        surveyId = intent.getLongExtra("surveyId", -1);
         Boolean newSurvey = intent.getBooleanExtra("newSurvey", false);
         if (newSurvey) {
             nextCount = 0;
@@ -232,17 +237,67 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
                 nextCount++;
                 if (response.isSuccessful() && subSurveyCount == nextCount) {
                     customProgressDialog.dismiss();
-                    moveToActivity(MainActivity.class);
+                    if (Objects.equals(surveyId, Global.TOKEN.getBaseSurveyId())) {
+                        savePreSurvey();
+                    } else if (Objects.equals(surveyId, Global.TOKEN.getFollowUpSurveyId())) {
+                        savePostSurvey();
+                    } else {
+                        moveToActivity(MainActivity.class);
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Boolean> call, Throwable t) {
                 Log.e(TAG, Arrays.toString(t.getStackTrace()) + "");
+                customProgressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    public void savePreSurvey() {
+        SurveySubjectRequest request = SurveySubjectRequest.builder()
+                .id(Global.TOKEN.getSurveySubjectId()).build();
+
+        iEmaService.togglePreSurveyStatus(request).enqueue(new Callback<Void>() {
+
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    moveToActivity(MainActivity.class);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, t.getStackTrace() + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void savePostSurvey() {
+        SurveySubjectRequest request = SurveySubjectRequest.builder()
+                .id(Global.TOKEN.getSurveySubjectId()).build();
+
+        iEmaService.togglePostSurveyStatus(request).enqueue(new Callback<Void>() {
+
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    moveToActivity(IntroActivity.class);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, t.getStackTrace() + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void moveToActivity(Class clazz) {
         Intent intent = new Intent(getApplicationContext(), clazz);
@@ -254,7 +309,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         surveyResetDialog.show();
         surveyResetDialog.findViewById(R.id.ok).setOnClickListener(v -> {
             surveyResetDialog.dismiss();
-            finish();
+            moveToActivity(IntroActivity.class);
         });
         surveyResetDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
             surveyResetDialog.dismiss();

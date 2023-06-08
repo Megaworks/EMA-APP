@@ -18,6 +18,14 @@ public class Token {
 
     private Long subjectId;
 
+    private Long surveyManagerId;
+
+    private Long baseSurveyId;
+
+    private Long mainSurveyId;
+
+    private Long followUpSurveyId;
+
     private String subjectName;
 
     private String subjectTel;
@@ -25,6 +33,4 @@ public class Token {
     private String inspectId;
 
     private Long surveySubjectId;
-
-    private Long surveyId;
 }

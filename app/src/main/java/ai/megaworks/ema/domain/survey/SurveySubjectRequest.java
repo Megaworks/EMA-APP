@@ -13,7 +13,7 @@ public class SurveySubjectRequest {
 
     private Long id;
 
-    private Long surveyId;
+    private Long surveyManagerId;
 
     private Long subjectId;
 
