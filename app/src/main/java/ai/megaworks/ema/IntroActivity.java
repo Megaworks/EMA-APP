@@ -1,17 +1,13 @@
 package ai.megaworks.ema;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -26,7 +22,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class IntroActivity extends AppCompatActivity {
 
     private final String TAG = this.getClass().getName();
 
@@ -39,24 +35,26 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_intro);
 
-        EditText subjectId = findViewById(R.id.loginSubjectId);
-        EditText inspectId = findViewById(R.id.loginInspectId);
-        EditText subjectTel = findViewById(R.id.loginSubjectTel);
+        new Handler().postDelayed(() -> {
 
-        AppCompatButton btnLogin = findViewById(R.id.btnLogin);
+            // 자동 로그인 확인하기 위함
+            SharedPreferences sharedPreferences = getSharedPreferences("USERINFO", MODE_PRIVATE);
 
-        btnLogin.setOnClickListener(view -> {
-            ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            if (sharedPreferences.getLong("subjectId", 0L) != 0L) {
+                Long subjectIdInfo = sharedPreferences.getLong("subjectId", 0L);
+                String subjectTelInfo = sharedPreferences.getString("subjectTel", null);
+                String inspectIdInfo = sharedPreferences.getString("inspectId", null);
+                Global.TOKEN.setSubjectId(subjectIdInfo);
+                Global.TOKEN.setInspectId(subjectTelInfo);
+                Global.TOKEN.setSubjectTel(inspectIdInfo);
 
-            if (networkInfo == null) {
-                Toast.makeText(getApplicationContext(), getString(R.string.permission_denied_network), Toast.LENGTH_SHORT).show();
+                login(subjectIdInfo, inspectIdInfo, subjectTelInfo);
+            } else {
+                moveToActivity(LoginActivity.class);
             }
-            login(Long.parseLong(subjectId.getText().toString()), inspectId.getText().toString(), subjectTel.getText().toString());
-        });
-
+        }, 1000);// 1초 정도 딜레이를 준 후 시작
 
     }
 
@@ -70,6 +68,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     LoginResponse loginResponse = response.body();
 
+                    if (loginResponse == null)
+                        moveToActivity(LoginActivity.class);
                     SharedPreferences sharedPreferences = getSharedPreferences("USERINFO", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                     Global.TOKEN.setSubjectName(loginResponse.getName());
 
                     // TODO : 설문조사가 한개인 경우이기 때문에 surveyId 고정
-                    getSurveySubject(subjectId, 1L);
+                    getSurveySubjectInfo(subjectId, 1L);
                 } else {
                     Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_SHORT).show();
                 }
@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void getSurveySubject(Long subjectId, Long surveyId) {
+    private void getSurveySubjectInfo(Long subjectId, Long surveyId) {
         SurveySubjectRequest request = SurveySubjectRequest.builder()
                 .subjectId(subjectId)
                 .surveyId(surveyId).build();

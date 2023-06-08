@@ -25,7 +25,7 @@ public interface IEmaService {
 
     // 해당 설문조사의 대상자인지 확인
     @POST("survey/subject/info")
-    Call<SurveySubjectResponse> checkValidSubject(@Body SurveySubjectRequest request);
+    Call<SurveySubjectResponse> getSurveySubject(@Body SurveySubjectRequest request);
 
     @GET("survey")
     Call<Survey> getSurveyInfo(@Query("id") Long id);

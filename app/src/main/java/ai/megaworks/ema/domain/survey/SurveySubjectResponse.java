@@ -23,4 +23,6 @@ public class SurveySubjectResponse {
 
     private boolean finishedPostSurvey;
 
+    private boolean done;
+
 }
