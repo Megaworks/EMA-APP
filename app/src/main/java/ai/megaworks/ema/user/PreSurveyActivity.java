@@ -1,8 +1,6 @@
 package ai.megaworks.ema.user;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -12,11 +10,11 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.ActivityCompat;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import ai.megaworks.ema.Global;
+import ai.megaworks.ema.PermissionSupport;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -41,28 +39,14 @@ public class PreSurveyActivity extends AppCompatActivity {
     private final static int PERMISSIONS_REQUEST = 0x0000001;
     private final String TAG = this.getClass().getName();
 
-    public void checkPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-                Toast.makeText(this, getString(R.string.permission_warn_message), Toast.LENGTH_LONG).show();
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSIONS_REQUEST);
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSIONS_REQUEST);
-            }
-        }
-    }
+    private PermissionSupport permission;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_survey);
 
-        checkPermission();
+        permissionCheck();
 
         user_btn = findViewById(R.id.user_btn);
 
@@ -91,6 +75,19 @@ public class PreSurveyActivity extends AppCompatActivity {
             setFirebaseMessageToken(Global.TOKEN.getSubjectId(), firebaseCloudMessageToken);
 
         });
+    }
+
+    // 권한 체크
+    private void permissionCheck() {
+
+        // PermissionSupport.java 클래스 객체 생성
+        permission = new PermissionSupport(this, this);
+
+        // 권한 체크 후 리턴이 false로 들어오면
+        if (!permission.checkPermission()) {
+            //권한 요청
+            permission.requestPermission();
+        }
     }
 
     public void setFirebaseMessageToken(Long id, String token) {
