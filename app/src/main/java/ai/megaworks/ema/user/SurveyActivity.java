@@ -23,6 +23,7 @@ import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;
 import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.layout.CustomSurveyFragment;
+import ai.megaworks.ema.layout.RadioAnswerFrequencyType1Fragment;
 import ai.megaworks.ema.layout.ShortAnswerRangeItemFragment;
 import ai.megaworks.ema.layout.ShortAnswerYNItemFragment;
 import ai.megaworks.ema.layout.TemperatureItemFragment;
@@ -113,6 +114,8 @@ public class SurveyActivity extends AppCompatActivity {
                             fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), rootSurvey);
                         } else if (type.equals("YN")) {
                             fragment = new ShortAnswerYNItemFragment(getApplicationContext(), rootSurvey);
+                        } else if (type.equals("NEALL")) {
+                            fragment = new RadioAnswerFrequencyType1Fragment(getApplicationContext(), rootSurvey);
                         }
                         fragmentTransaction.add(R.id.list, fragment);
                         fragments.add(fragment);
@@ -129,6 +132,8 @@ public class SurveyActivity extends AppCompatActivity {
                             fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), survey);
                         } else if (type.equals("YN")) {
                             fragment = new ShortAnswerYNItemFragment(getApplicationContext(), survey);
+                        } else if (type.equals("NEALL")) {
+                            fragment = new RadioAnswerFrequencyType1Fragment(getApplicationContext(), survey);
                         }
                         fragmentTransaction.add(R.id.list, fragment);
                         fragments.add(fragment);
