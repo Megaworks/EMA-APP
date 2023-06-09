@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.Objects;
 
+import ai.megaworks.ema.R;
 import ai.megaworks.ema.databinding.FragmentGuideItemBinding;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -74,7 +76,11 @@ public class GuideItemFragment extends CustomSurveyFragment implements Subscribe
 
     @Override
     public void update(Long id) {
-        if (Objects.equals(survey.getId(), id) && binding != null)
+        if (Objects.equals(survey.getId(), id) && binding != null) {
             binding.checkIcon.setVisibility(View.VISIBLE);
+            binding.root.setOnClickListener(v -> {
+                Toast.makeText(context, getString(R.string.already_done_survey), Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 }
