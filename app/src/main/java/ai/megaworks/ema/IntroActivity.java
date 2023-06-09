@@ -115,7 +115,7 @@ public class IntroActivity extends AppCompatActivity {
 
                     if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
-                        finish();
+                        finishAffinity();
                     } else if (result.isDone()) {
                         Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
                         intent.putExtra("surveyId", result.getFollowUpSurveyId());
