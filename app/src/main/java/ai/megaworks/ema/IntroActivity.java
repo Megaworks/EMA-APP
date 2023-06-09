@@ -111,6 +111,7 @@ public class IntroActivity extends AppCompatActivity {
                     Global.TOKEN.setMainSurveyId(result.getMainSurveyId());
                     Global.TOKEN.setBaseSurveyId(result.getBaseSurveyId());
                     Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
+
                     if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
                         finish();

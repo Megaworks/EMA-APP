@@ -8,9 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ai.megaworks.ema.Global;
-import ai.megaworks.ema.R;
 import ai.megaworks.ema.databinding.FragmentShortAnswerRangeItemBinding;
-import ai.megaworks.ema.databinding.FragmentTemperatureItemBinding;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.survey.Survey;

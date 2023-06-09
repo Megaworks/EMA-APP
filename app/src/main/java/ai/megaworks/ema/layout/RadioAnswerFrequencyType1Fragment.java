@@ -48,7 +48,7 @@ public class RadioAnswerFrequencyType1Fragment extends CustomSurveyFragment {
 
         binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 
-            switch(checkedId){
+            switch (checkedId) {
                 case R.id.radio_button_never:
                     this.surveyResult.setAnswer("0");
                     break;

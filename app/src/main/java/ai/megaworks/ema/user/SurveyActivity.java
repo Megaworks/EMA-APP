@@ -43,9 +43,6 @@ public class SurveyActivity extends AppCompatActivity {
 
     private final IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
 
-    // 안드로이드 뒤로가기 버튼 기능
-    private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
-
     private List<SurveyResult> surveyResults = new ArrayList<>();
 
     private List<CustomSurveyFragment> fragments = new ArrayList<>();
@@ -103,40 +100,19 @@ public class SurveyActivity extends AppCompatActivity {
 
                     List<Survey> surveys = rootSurvey.getChildren();
 
-                    CustomSurveyFragment fragment = null;
+                    CustomSurveyFragment fragment;
                     if (surveys.size() == 0) {
-                        String type = rootSurvey.getType();
-                        if (type.equals("TEMPRT")) {
-                            fragment = new TemperatureItemFragment(getApplicationContext(), rootSurvey);
-                        } else if (type.equals("RECORD")) {
-                            fragment = new VoiceRecordItemFragment(getApplicationContext(), rootSurvey, getExternalCacheDir().getAbsolutePath());
-                        } else if (type.equals("RANGE")) {
-                            fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), rootSurvey);
-                        } else if (type.equals("YN")) {
-                            fragment = new ShortAnswerYNItemFragment(getApplicationContext(), rootSurvey);
-                        } else if (type.equals("NEALL")) {
-                            fragment = new RadioAnswerFrequencyType1Fragment(getApplicationContext(), rootSurvey);
-                        }
+                        fragment = getSurveyFragment(rootSurvey);
                         fragmentTransaction.add(R.id.list, fragment);
                         fragments.add(fragment);
                     }
 
                     for (Survey survey : surveys) {
-                        String type = survey.getType();
-                        if (type == null) continue;
-                        if (type.equals("TEMPRT")) {
-                            fragment = new TemperatureItemFragment(getApplicationContext(), survey);
-                        } else if (type.equals("RECORD")) {
-                            fragment = new VoiceRecordItemFragment(getApplicationContext(), survey, getExternalCacheDir().getAbsolutePath());
-                        } else if (type.equals("RANGE")) {
-                            fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), survey);
-                        } else if (type.equals("YN")) {
-                            fragment = new ShortAnswerYNItemFragment(getApplicationContext(), survey);
-                        } else if (type.equals("NEALL")) {
-                            fragment = new RadioAnswerFrequencyType1Fragment(getApplicationContext(), survey);
+                        fragment = getSurveyFragment(survey);
+                        if(fragment != null) {
+                            fragmentTransaction.add(R.id.list, fragment);
+                            fragments.add(fragment);
                         }
-                        fragmentTransaction.add(R.id.list, fragment);
-                        fragments.add(fragment);
                     }
 
                     fragmentTransaction.commitAllowingStateLoss();
@@ -149,6 +125,28 @@ public class SurveyActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private CustomSurveyFragment getSurveyFragment(Survey survey){
+
+        CustomSurveyFragment fragment = null;
+        String type = survey.getType();
+
+        if (type == null) return null;
+
+        if (type.equals("TEMPRT")) {
+            fragment = new TemperatureItemFragment(getApplicationContext(), survey);
+        } else if (type.equals("RECORD")) {
+            fragment = new VoiceRecordItemFragment(getApplicationContext(), survey, getExternalCacheDir().getAbsolutePath());
+        } else if (type.equals("RANGE")) {
+            fragment = new ShortAnswerRangeItemFragment(getApplicationContext(), survey);
+        } else if (type.equals("YN")) {
+            fragment = new ShortAnswerYNItemFragment(getApplicationContext(), survey);
+        } else if (type.equals("NEALL")) {
+            fragment = new RadioAnswerFrequencyType1Fragment(getApplicationContext(), survey);
+        }
+
+        return fragment;
     }
 
     @Override

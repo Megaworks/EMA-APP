@@ -13,8 +13,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
+import ai.megaworks.ema.domain.firebase.FirebaseTokenInfo;
 import ai.megaworks.ema.domain.subject.LoginRequest;
 import ai.megaworks.ema.domain.subject.LoginResponse;
 import ai.megaworks.ema.domain.survey.SurveySubjectRequest;
@@ -111,6 +114,19 @@ public class LoginActivity extends AppCompatActivity {
                     Global.TOKEN.setMainSurveyId(result.getMainSurveyId());
                     Global.TOKEN.setBaseSurveyId(result.getBaseSurveyId());
                     Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
+
+                    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.d(TAG, task.getException() + "");
+                            return;
+                        }
+
+                        String firebaseCloudMessageToken = task.getResult();
+                        Log.d(TAG, firebaseCloudMessageToken);
+                        setFirebaseMessageToken(Global.TOKEN.getSubjectId(), firebaseCloudMessageToken);
+
+                    });
+
                     if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
                         finish();
@@ -136,6 +152,26 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void setFirebaseMessageToken(Long id, String token) {
+
+        FirebaseTokenInfo firebaseTokenInfo = new FirebaseTokenInfo(id, token);
+        iEmaService.setFirebaseMessageToken(firebaseTokenInfo).enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e(TAG, t.getStackTrace() + "");
+                Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void moveToActivity(Class clazz) {
         Intent intent = new Intent(getApplicationContext(), clazz);

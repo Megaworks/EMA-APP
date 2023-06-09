@@ -36,11 +36,11 @@ public interface IEmaService {
 
     // 사전 설문조사 상태값 변경
     @POST("survey/pre")
-    Call<Void> togglePreSurveyStatus(@Body SurveySubjectRequest request);
+    Call<Void> toggleBaseSurveyStatus(@Body SurveySubjectRequest request);
 
     // 최종 설문조사 상태값 변경
     @POST("survey/post")
-    Call<Void> togglePostSurveyStatus(@Body SurveySubjectRequest request);
+    Call<Void> toggleFollowUpSurveyStatus(@Body SurveySubjectRequest request);
 
     // 대상자 로그인
     @POST("/subject/login")

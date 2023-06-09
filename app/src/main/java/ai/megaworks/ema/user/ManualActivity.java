@@ -30,8 +30,6 @@ import ai.megaworks.ema.domain.survey.SurveyResult;
 import ai.megaworks.ema.layout.GuideItemFragment;
 import ai.megaworks.ema.listener.Publisher;
 import ai.megaworks.ema.listener.Subscriber;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,9 +41,6 @@ public class ManualActivity extends AppCompatActivity implements Publisher {
     private RetrofitClient retrofitClient = RetrofitClient.getInstance();
 
     private IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
-
-    // 안드로이드 뒤로가기 버튼 기능
-    private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
 
     private TextView title;
     private static int nextCount = 0;

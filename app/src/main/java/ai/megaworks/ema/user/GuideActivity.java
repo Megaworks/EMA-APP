@@ -30,6 +30,7 @@ import java.util.Objects;
 
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.IntroActivity;
+import ai.megaworks.ema.PermissionSupport;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -54,9 +55,6 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
     private IEmaService iEmaService = RetrofitClient.getRetrofitInterface();
 
-    // 안드로이드 뒤로가기 버튼 기능
-    private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
-
     private TextView title;
     private static int nextCount = 0;
 
@@ -76,10 +74,14 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
     private Long surveyId;
 
+    private PermissionSupport permission;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
+
+        permissionCheck();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(R.layout.dialog_progress);
@@ -101,6 +103,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         completedSurveyId = intent.getLongExtra("completedSurveyId", -1);
 
         if (request != null && completedSurveyId != -1) {
+            // TODO 중복 체크
             completedSurveyIds.add(completedSurveyId);
             for (SurveyResult surveyResult : request) {
 
@@ -236,11 +239,14 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 nextCount++;
                 if (response.isSuccessful() && subSurveyCount == nextCount) {
+
+                    nextCount = 0;
+
                     customProgressDialog.dismiss();
                     if (Objects.equals(surveyId, Global.TOKEN.getBaseSurveyId())) {
-                        savePreSurvey();
+                        toggleBaseSurveyStatus();
                     } else if (Objects.equals(surveyId, Global.TOKEN.getFollowUpSurveyId())) {
-                        savePostSurvey();
+                        toggleFollowUpSurveyStatus();
                     } else {
                         moveToActivity(MainActivity.class);
                     }
@@ -256,11 +262,23 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         });
     }
 
-    public void savePreSurvey() {
+    private void permissionCheck() {
+
+        // PermissionSupport.java 클래스 객체 생성
+        permission = new PermissionSupport(this, this);
+
+        // 권한 체크 후 리턴이 false 로 들어오면
+        if (!permission.checkPermission()) {
+            //권한 요청
+            permission.requestPermission();
+        }
+    }
+
+    public void toggleBaseSurveyStatus() {
         SurveySubjectRequest request = SurveySubjectRequest.builder()
                 .id(Global.TOKEN.getSurveySubjectId()).build();
 
-        iEmaService.togglePreSurveyStatus(request).enqueue(new Callback<Void>() {
+        iEmaService.toggleBaseSurveyStatus(request).enqueue(new Callback<Void>() {
 
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -277,11 +295,11 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         });
     }
 
-    public void savePostSurvey() {
+    public void toggleFollowUpSurveyStatus() {
         SurveySubjectRequest request = SurveySubjectRequest.builder()
                 .id(Global.TOKEN.getSurveySubjectId()).build();
 
-        iEmaService.togglePostSurveyStatus(request).enqueue(new Callback<Void>() {
+        iEmaService.toggleFollowUpSurveyStatus(request).enqueue(new Callback<Void>() {
 
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -301,6 +319,7 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
 
     private void moveToActivity(Class clazz) {
         Intent intent = new Intent(getApplicationContext(), clazz);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
@@ -309,7 +328,10 @@ public class GuideActivity extends AppCompatActivity implements Publisher {
         surveyResetDialog.show();
         surveyResetDialog.findViewById(R.id.ok).setOnClickListener(v -> {
             surveyResetDialog.dismiss();
-            moveToActivity(IntroActivity.class);
+            if (Objects.equals(surveyId, Global.TOKEN.getBaseSurveyId()) || Objects.equals(surveyId, Global.TOKEN.getFollowUpSurveyId()))
+                moveToActivity(IntroActivity.class);
+            else
+                moveToActivity(MainActivity.class);
         });
         surveyResetDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
             surveyResetDialog.dismiss();

@@ -30,10 +30,6 @@
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="ai.megaworks.ema.user.PreSurveyActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name="ai.megaworks.ema.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>

@@ -1,7 +1,5 @@
 package ai.megaworks.ema.domain.survey;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

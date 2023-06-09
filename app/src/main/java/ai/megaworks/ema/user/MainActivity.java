@@ -14,8 +14,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import ai.megaworks.ema.Global;
+import ai.megaworks.ema.IntroActivity;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -55,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("newSurvey", true);
             startActivity(intent);
         });
-
 
         // 마이 페이지
         user_btn.setOnClickListener(view -> {
@@ -102,5 +103,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), getString(R.string.error_network_with_server), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        backKeyHandler.onBackPressed();
     }
 }

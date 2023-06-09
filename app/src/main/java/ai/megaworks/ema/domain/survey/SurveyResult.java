@@ -3,13 +3,11 @@ package ai.megaworks.ema.domain.survey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import okhttp3.MultipartBody;
 
 @Data
 @Builder

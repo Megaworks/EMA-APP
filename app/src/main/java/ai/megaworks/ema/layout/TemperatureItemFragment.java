@@ -7,10 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.material.slider.Slider;
-
 import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.databinding.FragmentTemperatureItemBinding;

@@ -7,11 +7,11 @@ import ai.megaworks.ema.domain.survey.SurveyResult;
 public class CustomSurveyFragment extends Fragment {
     SurveyResult surveyResult;
 
-    public CustomSurveyFragment(){
+    public CustomSurveyFragment() {
         surveyResult = SurveyResult.builder().build();
     }
 
-    public SurveyResult getSurveyResult(){
+    public SurveyResult getSurveyResult() {
         return this.surveyResult;
     }
 }

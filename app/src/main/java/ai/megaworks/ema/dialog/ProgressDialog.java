@@ -7,8 +7,7 @@ import android.view.Window;
 import ai.megaworks.ema.R;
 
 public class ProgressDialog extends Dialog {
-    public ProgressDialog(Context context)
-    {
+    public ProgressDialog(Context context) {
         super(context);
         // 다이얼 로그 제목을 안보이게...
         requestWindowFeature(Window.FEATURE_NO_TITLE);
