@@ -1,5 +1,7 @@
 package ai.megaworks.ema.layout;
 
+import static android.media.AudioManager.MODE_IN_CALL;
+import static android.media.AudioManager.MODE_RINGTONE;
 import static ai.megaworks.ema.util.RecordUtils.BUFFER_ELEMENTS2REC;
 import static ai.megaworks.ema.util.RecordUtils.BYTES_PER_ELEMENT;
 import static ai.megaworks.ema.util.RecordUtils.RECORDER_AUDIO_ENCODING;
@@ -12,9 +14,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,6 +61,8 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
     private boolean isRecording = false;
     private int recordingTime = 0;
 
+    private AudioManager audioManager;
+
     private List<String> filePaths = new ArrayList<>();
 
     private int fileCount = 0;
@@ -68,6 +75,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         this.surveyResult.setSurveySubjectId(Global.TOKEN.getSurveySubjectId());
         this.surveyResult.setSurveyAt(Global.defaultDateStr);
         this.baseFileName = Global.TOKEN.getSubjectId() + "_" + baseFileName + "_" + survey.getId();
+        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public VoiceRecordItemFragment(Context context, Survey survey, Class clazz) {
@@ -117,7 +125,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
             Dialog dialog = new Dialog(view.getContext());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_reset);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
 
@@ -145,7 +153,20 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
             setRecodingButton(isRecording);
         });
 
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            audioManager.addOnModeChangedListener(context.getMainExecutor(), mode -> {
+                if(mode ==  MODE_RINGTONE || mode == MODE_IN_CALL) {
+                    if(isRecording) {
+                        setRecodingButton(false);
+                    }
+                }
+            });
+        }
+
         return binding.root;
+
+
     }
 
     private void saveFile(String savePath, String baseFileName, List<String> filePaths) {
