@@ -249,13 +249,17 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
 
     @Override
     public SurveyResult getSurveyResult() {
-        if (preCheck()) {
+        if(isRecording) {
+            Toast.makeText(context, getString(R.string.no_submit_ing_recording), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        if (conditionCheck()) {
             return this.surveyResult;
         }
         return null;
     }
 
-    private boolean preCheck() {
+    private boolean conditionCheck() {
         if (recordingTime < Integer.parseInt(survey.getMinRecordTime())) {
             Toast.makeText(context, getString(R.string.no_satisfied_min_record_time), Toast.LENGTH_SHORT).show();
         } else {

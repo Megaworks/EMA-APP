@@ -12,6 +12,7 @@
     <string name="no_available_survey">설문 조사 가능 기간이 아닙니다.</string>
     <string name="dialog_title_reset_survey">설문조사</string>
     <string name="dialog_body_reset_survey">지금까지 작업한 내용을 모두 잃게 됩니다. \n 그래도 취소 하시겠습니까?</string>
+    <string name="no_submit_ing_recording">녹음중에는 완료할 수 없습니다.</string>
     <string name="no_satisfied_min_record_time">최소 음성 시간을 만족 하지 못했습니다.</string>
     <string name="no_satisfied_max_record_time">최대 음성 시간을 초과 하였습니다.</string>
     <string name="default_notification_channel_id">ema-cadb2</string>
