@@ -59,7 +59,6 @@ public class GuideItemFragment extends CustomSurveyFragment implements Subscribe
         if(description != null && description.length() > 0)
             binding.surveyComment.setText(this.survey.getDescription());
         else {
-            binding.surveyComment.setText("HH");
             binding.surveyComment.setVisibility(View.GONE);
         }
 
