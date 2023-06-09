@@ -17,6 +17,8 @@ public class SurveySubjectResponse {
 
     private Long followUpSurveyId;
 
+    private Long manualSurveyId;
+
     private String startAt;
 
     private String endAt;

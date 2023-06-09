@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ai.megaworks.ema.Global;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -63,8 +64,7 @@ public class SurveyActivity extends AppCompatActivity {
         btnNext.setOnClickListener(view -> {
             Intent innerIntent;
 
-            // TODO : 메뉴얼 설문조사 고정 18L
-            if (parentSurveyId == 18L) {
+            if (parentSurveyId == Global.TOKEN.getManualSurveyId()) {
                 innerIntent = new Intent(getApplicationContext(), ManualActivity.class);
             } else {
                 innerIntent = new Intent(getApplicationContext(), GuideActivity.class);

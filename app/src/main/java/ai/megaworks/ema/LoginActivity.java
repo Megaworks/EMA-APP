@@ -114,6 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                     Global.TOKEN.setMainSurveyId(result.getMainSurveyId());
                     Global.TOKEN.setBaseSurveyId(result.getBaseSurveyId());
                     Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
+                    Global.TOKEN.setManualSurveyId(result.getManualSurveyId());
 
                     FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {

@@ -26,6 +26,8 @@ public class Token {
 
     private Long followUpSurveyId;
 
+    private Long manualSurveyId;
+
     private String subjectName;
 
     private String subjectTel;

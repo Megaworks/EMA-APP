@@ -92,7 +92,7 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), getString(R.string.permission_denied_network), Toast.LENGTH_SHORT).show();
+                moveToActivity(LoginActivity.class);
             }
         });
     }
@@ -111,6 +111,7 @@ public class IntroActivity extends AppCompatActivity {
                     Global.TOKEN.setMainSurveyId(result.getMainSurveyId());
                     Global.TOKEN.setBaseSurveyId(result.getBaseSurveyId());
                     Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
+                    Global.TOKEN.setManualSurveyId(result.getManualSurveyId());
 
                     if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
