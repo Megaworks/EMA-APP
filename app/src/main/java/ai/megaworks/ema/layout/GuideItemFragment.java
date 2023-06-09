@@ -54,7 +54,14 @@ public class GuideItemFragment extends CustomSurveyFragment implements Subscribe
         binding = FragmentGuideItemBinding.inflate(inflater, container, false);
 
         binding.survey.setText(this.survey.getQuestion());
-        binding.surveyComment.setText(this.survey.getDescription());
+
+        String description = this.survey.getDescription();
+        if(description != null && description.length() > 0)
+            binding.surveyComment.setText(this.survey.getDescription());
+        else {
+            binding.surveyComment.setText("HH");
+            binding.surveyComment.setVisibility(View.GONE);
+        }
 
         binding.checkIcon.setVisibility(View.INVISIBLE);
 
