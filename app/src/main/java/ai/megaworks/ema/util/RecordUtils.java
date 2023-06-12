@@ -182,7 +182,7 @@ public class RecordUtils {
         return bytes;
     }
 
-    public static void combineRecordFile(String savePath, String filePath1, String filePath2) {
+    public static void combineRecordFile(String savePath, String filePath1, String filePath2, boolean isFirst) {
 
 //        int RECORDER_BPP = 16;
         int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
@@ -204,8 +204,7 @@ public class RecordUtils {
             totalAudioLen = in1.getChannel().size() + in2.getChannel().size();
             totalDataLen = totalAudioLen + 36;
 
-            WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
-                    longSampleRate, channels, byteRate);
+            if(isFirst) WriteWaveFileHeader(out, totalAudioLen, totalDataLen, longSampleRate, channels, byteRate);
 
             while (in1.read(data) != -1) {
                 out.write(data);
@@ -214,6 +213,7 @@ public class RecordUtils {
                 out.write(data);
             }
         } catch (IOException e) {
+            Log.v("combineRecordFile", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -230,7 +230,11 @@ public class RecordUtils {
             String filePath1 = filePaths.get(i);
             String filePath2 = filePaths.get(i + 1);
 
-            combineRecordFile(tempSavePath, filePath1, filePath2);
+            if(i == 0) {
+                combineRecordFile(tempSavePath, filePath1, filePath2, true);
+            } else {
+                combineRecordFile(tempSavePath, filePath1, filePath2, false);
+            }
             filePaths.set(i + 1, tempSavePath);
         }
 
@@ -246,7 +250,10 @@ public class RecordUtils {
 
         try {
             File saveFile = new File(savePath);
-            if(saveFile.exists()) saveFile.delete();
+            if(saveFile.exists())
+                if(saveFile.delete()){
+                    return null;
+                }
             Path newFilePath = Files.move(file, newFile);
             return newFilePath.toFile();
         } catch (IOException e) {
