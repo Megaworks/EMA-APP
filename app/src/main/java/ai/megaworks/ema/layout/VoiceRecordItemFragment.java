@@ -134,7 +134,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
                 recordingThread = null;
                 timeHandler.removeMessages(0);
                 binding.recodingTime.setText("0:00");
-                isRecording = false;
+                if(isRecording) setRecodingButton(false);
                 filePaths.clear();
                 dialog.dismiss();
             });
@@ -268,6 +268,7 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
                 isRecording = !isRecording;
                 setRecodingButton(isRecording);
                 Toast.makeText(context, getString(R.string.no_satisfied_max_record_time), Toast.LENGTH_SHORT).show();
+                timeHandler.removeMessages(0);
             }
         }
     };
