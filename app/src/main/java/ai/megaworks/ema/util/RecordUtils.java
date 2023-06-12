@@ -245,6 +245,8 @@ public class RecordUtils {
         newFile = Paths.get(savePath);
 
         try {
+            File saveFile = new File(savePath);
+            if(saveFile.exists()) saveFile.delete();
             Path newFilePath = Files.move(file, newFile);
             return newFilePath.toFile();
         } catch (IOException e) {

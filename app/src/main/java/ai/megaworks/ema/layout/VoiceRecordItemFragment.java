@@ -176,6 +176,10 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         File newPath = new File(savePath + "/" + baseFileName + ".wav");
 
         try {
+            if(newPath.exists())
+                if(!newPath.delete()) {
+                    return;
+                }
             RecordUtils.rawToWave(rawPath, newPath); // PCM to WAV
         } catch (IOException e) {
             e.printStackTrace();
