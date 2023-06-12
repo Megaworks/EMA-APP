@@ -251,7 +251,7 @@ public class RecordUtils {
         try {
             File saveFile = new File(savePath);
             if(saveFile.exists())
-                if(saveFile.delete()){
+                if(!saveFile.delete()){
                     return null;
                 }
             Path newFilePath = Files.move(file, newFile);
