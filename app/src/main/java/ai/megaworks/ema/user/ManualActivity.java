@@ -1,9 +1,13 @@
 package ai.megaworks.ema.user;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,8 +24,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import ai.megaworks.ema.Global;
+import ai.megaworks.ema.IntroActivity;
 import ai.megaworks.ema.R;
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
@@ -54,6 +60,8 @@ public class ManualActivity extends AppCompatActivity implements Publisher {
 
     private static List<Long> completedSurveyIds = new ArrayList<>();
     private Long completedSurveyId = -1L;
+
+    private Dialog surveyResetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +112,14 @@ public class ManualActivity extends AppCompatActivity implements Publisher {
 
         todayDate.setText(Global.dateToString(Global.DATE_FORMATTER2));
 
+        surveyResetDialog = new Dialog(this);
+        surveyResetDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        surveyResetDialog.setContentView(R.layout.dialog_reset);
+        surveyResetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        surveyResetDialog.setCanceledOnTouchOutside(false);
+
         // 뒤로가기 리스너
-        back.setOnClickListener(view -> finish());
+        back.setOnClickListener(view -> onBackPressed());
 
         manualSurveyCompleted.setOnClickListener(view -> {
             makeSurveyResultRequest(surveyResultMap);
@@ -165,9 +179,20 @@ public class ManualActivity extends AppCompatActivity implements Publisher {
         finish();
     }
 
-    private void moveToActivity(Class clazz, Survey data) {
+    @Override
+    public void onBackPressed() {
+        surveyResetDialog.show();
+        surveyResetDialog.findViewById(R.id.ok).setOnClickListener(v -> {
+            surveyResetDialog.dismiss();
+            moveToActivity(MainActivity.class);
+        });
+        surveyResetDialog.findViewById(R.id.cancel).setOnClickListener(v -> {
+            surveyResetDialog.dismiss();
+        });
+    }
+
+    private void moveToActivity(Class clazz) {
         Intent intent = new Intent(getApplicationContext(), clazz);
-        intent.putExtra("surveyInfo", data);
         startActivity(intent);
     }
 
