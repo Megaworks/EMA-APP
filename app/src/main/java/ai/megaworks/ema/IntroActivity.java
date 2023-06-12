@@ -9,6 +9,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import ai.megaworks.ema.domain.IEmaService;
 import ai.megaworks.ema.domain.RetrofitClient;
 import ai.megaworks.ema.domain.subject.LoginRequest;
@@ -113,6 +117,17 @@ public class IntroActivity extends AppCompatActivity {
                     Global.TOKEN.setFollowUpSurveyId(result.getFollowUpSurveyId());
                     Global.TOKEN.setManualSurveyId(result.getManualSurveyId());
 
+                    Date startDt, endDt;
+
+                    try {
+                        startDt = new SimpleDateFormat("yyyy-MM-dd").parse(result.getStartAt());
+                        endDt = new SimpleDateFormat("yyyy-MM-dd").parse(result.getEndAt());
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    Date today = new Date();
+
                     if (result.isDone() && result.isFinishedPostSurvey()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
                         finishAffinity();
@@ -121,6 +136,9 @@ public class IntroActivity extends AppCompatActivity {
                         intent.putExtra("surveyId", result.getFollowUpSurveyId());
                         intent.putExtra("newSurvey", true);
                         startActivity(intent);
+                    } else if ((!today.after(startDt)) || (!today.before(endDt))) {
+                        Toast.makeText(getApplicationContext(), getString(R.string.no_available_survey), Toast.LENGTH_SHORT).show();
+                        finishAffinity();
                     } else if (result.isFinishedPreSurvey()) {
                         moveToActivity(MainActivity.class);
                     } else {
