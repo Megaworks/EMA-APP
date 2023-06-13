@@ -20,14 +20,14 @@
             <ImageView
                 android:id="@+id/text_bubble"
                 android:layout_width="match_parent"
-                android:layout_height="198dp"
+                android:layout_height="250dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/text_bubble2_1" />
 
             <TextView
                 android:id="@+id/recordComment"
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="-20dp"
                 android:layout_marginRight="-10dp"
@@ -75,8 +75,8 @@
             android:id="@+id/voiceRecordTimeZone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:lineHeight="23dp"
             android:text=""
             android:textAlignment="center"
@@ -89,7 +89,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:text="0:00"
             android:textAlignment="center"
             android:textColor="@color/title_color_purple1_1"
