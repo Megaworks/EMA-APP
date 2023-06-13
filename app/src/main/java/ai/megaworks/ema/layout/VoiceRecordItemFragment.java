@@ -122,6 +122,9 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
         }
 
         binding.reset.setOnClickListener(view -> {
+
+            if(isRecording) setRecodingButton(false);
+
             Dialog dialog = new Dialog(view.getContext());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_reset);
@@ -134,7 +137,6 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
                 recordingThread = null;
                 timeHandler.removeMessages(0);
                 binding.recodingTime.setText("0:00");
-                if(isRecording) setRecodingButton(false);
                 filePaths.clear();
                 dialog.dismiss();
             });
