@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -128,6 +129,13 @@ public class VoiceRecordItemFragment extends CustomSurveyFragment {
             Dialog dialog = new Dialog(view.getContext());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_reset);
+
+            TextView title = dialog.findViewById(R.id.title);
+            title.setText(getString(R.string.dialog_reset_record_title));
+
+            TextView content = dialog.findViewById(R.id.content);
+            content.setText(getString(R.string.dialog_reset_record_content));
+
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();

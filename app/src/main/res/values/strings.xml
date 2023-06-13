@@ -16,7 +16,8 @@
     <string name="no_satisfied_min_record_time">최소 음성 시간을 만족 하지 못했습니다.</string>
     <string name="no_satisfied_max_record_time">최대 음성 시간을 초과 하였습니다.</string>
     <string name="default_notification_channel_id">ema-cadb2</string>
-
+    <string name="dialog_reset_record_title">음성 녹음</string>
+    <string name="dialog_reset_record_content">지금까지 녹음된 내용들을 모두 잃게 됩니다. \n 그래도 진행하시겠습니까?</string>
     <string name="title_a">녹음 시작 단추를 누른 뒤\n아래 모든 문장을 읽고, 녹음 종료를 누르십시오.</string>
     <string name="content_b">우리나라의 가을은 참으로 아름답다.\n\n무엇보다도 산에 오를 땐 더욱더 그 빼어난 아름다움이 느껴진다.
         \n\n쓰다듬어진 듯한 완만함과, 깍아 놓은 듯한 뾰족함이 어우러진 산등성이를 따라 오르다 보면, 절로 감탄을 금 할 수가 없게 된다.
